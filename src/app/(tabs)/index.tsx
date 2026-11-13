@@ -1,74 +1,39 @@
-import { useCallback, useEffect, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
-import AnimeCard from '../../components/AnimeCard';
-import { ErrorView, Loading } from '../../components/StateViews';
-import { Anime, getSeasonNow, getTopAnime } from '../../services/anilist';
+import { ScrollView } from 'react-native';
+import Carousel from '../../components/Carousel';
+import HeroCarousel from '../../components/HeroCarousel';
+import TituloCard from '../../components/TituloCard';
+import WideCard from '../../components/WideCard';
+import { useAsync } from '../../hooks/useAsync';
+import { getNewEpisodes, getRecentlyAdded, getTopRated, getTrending } from '../../services/anilist';
 import { colors } from '../../theme';
 
-function Section({ title, data }: { title: string; data: Anime[] }) {
+export default function InicioScreen() {
+  const trending = useAsync(() => getTrending('ANIME'), []);
+  const episodes = useAsync(() => getNewEpisodes(12), []);
+  const recent = useAsync(() => getRecentlyAdded('ANIME'), []);
+  const top = useAsync(() => getTopRated('ANIME'), []);
+
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <FlatList
-        data={data}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => String(item.mal_id)}
-        contentContainerStyle={styles.list}
-        ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
-        renderItem={({ item }) => <AnimeCard anime={item} />}
+    <ScrollView style={{ flex: 1, backgroundColor: colors.bg }} contentContainerStyle={{ paddingVertical: 12 }}>
+      <HeroCarousel title="Em alta" state={trending} />
+      <Carousel
+        title="Novos episódios"
+        state={episodes}
+        keyOf={(e) => String(e.titulo.id)}
+        renderItem={(e) => <WideCard titulo={e.titulo} subtitle={`Episódio ${e.episode}`} />}
       />
-    </View>
-  );
-}
-
-export default function HomeScreen() {
-  const [top, setTop] = useState<Anime[]>([]);
-  const [airing, setAiring] = useState<Anime[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const topData = await getTopAnime(10);
-      const airingData = await getSeasonNow(10);
-      setTop(topData);
-      setAiring(airingData);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro inesperado.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  if (loading) return <Loading />;
-  if (error) return <ErrorView message={error} onRetry={load} />;
-
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={{ paddingVertical: 16 }}>
-      <Section title="Mais bem avaliados" data={top} />
-      <Section title="No ar nesta temporada" data={airing} />
-      <Text style={styles.credit}>Dados por AniList</Text>
+      <Carousel
+        title="Recém adicionados"
+        state={recent}
+        keyOf={(t) => String(t.id)}
+        renderItem={(t) => <TituloCard titulo={t} />}
+      />
+      <Carousel
+        title="Mais bem avaliados"
+        state={top}
+        keyOf={(t) => String(t.id)}
+        renderItem={(t) => <TituloCard titulo={t} />}
+      />
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  section: { marginBottom: 24 },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 20,
-    fontWeight: '800',
-    marginHorizontal: 16,
-    marginBottom: 12,
-  },
-  list: { paddingHorizontal: 16 },
-  credit: { color: colors.textMuted, fontSize: 12, textAlign: 'center', marginTop: 8 },
-});

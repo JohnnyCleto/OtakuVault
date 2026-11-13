@@ -228,10 +228,11 @@ async function gql<T>(
   return json.data as T;
 }
 
+// ---------- Busca genérica (base de quase todas as telas) ----------
 export type SearchParams = {
   type?: Kind;
-  sort?: string[]; 
-  status?: string; 
+  sort?: string[]; // ex.: ['TRENDING_DESC']
+  status?: string; // ex.: 'RELEASING'
   genre?: string;
   search?: string;
   page?: number;
