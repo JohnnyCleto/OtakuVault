@@ -2,7 +2,6 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
 
-
 type StoredUser = {
   name: string;
   email: string;

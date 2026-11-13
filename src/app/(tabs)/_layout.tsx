@@ -1,53 +1,33 @@
+import type { ComponentProps } from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import AppHeader from '../../components/AppHeader';
 import { colors } from '../../theme';
+
+type IconName = ComponentProps<typeof Ionicons>['name'];
+
+const tab = (title: string, icon: IconName) => ({
+  title,
+  tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+    <Ionicons name={icon} color={color} size={size} />
+  ),
+});
 
 export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: colors.bg },
-        headerTintColor: colors.text,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
-        tabBarActiveTintColor: colors.accent,
+        header: () => <AppHeader />,
+        sceneStyle: { backgroundColor: colors.bg },
+        tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.border },
+        tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.textMuted,
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Início',
-          tabBarIcon: ({ color, size }) => <Ionicons name="home" colors={color} size={size} />,
-        }}
-      />
-      {/* <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explorar',
-          tabBarIcon: ({ color, size }) => <Ionicons name="search" colors={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="ranking"
-        options={{
-          title: 'Ranking',
-          tabBarIcon: ({ color, size }) => <Ionicons name="trophy" colors={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="favorites"
-        options={{
-          title: 'Favoritos',
-          tabBarIcon: ({ color, size }) => <Ionicons name="heart" colors={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Perfil',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" colors={color} size={size} />,
-        }}
-      /> */}
+      <Tabs.Screen name="index" options={tab('Início', 'home')} />
+      <Tabs.Screen name="mangas" options={tab('Mangás', 'book')} />
+      <Tabs.Screen name="favoritos" options={tab('Favoritos', 'heart')} />
+      <Tabs.Screen name="mais" options={tab('Mais', 'menu')} />
     </Tabs>
   );
 }
