@@ -1,8 +1,5 @@
-// Serviço da API AniList (GraphQL, sem chave): https://docs.anilist.co
-// Cobre animes e mangás. Inclui fila (throttle), retry, timeout e cache.
-
 const ENDPOINT = 'https://graphql.anilist.co';
-const MIN_INTERVAL_MS = 700; // limite da API: ~90 req/min
+const MIN_INTERVAL_MS = 700; 
 const MAX_RETRIES = 2;
 const TIMEOUT_MS = 10000;
 const CACHE_MS = 5 * 60 * 1000;
@@ -17,7 +14,7 @@ export type Titulo = {
   cover: string;
   coverLarge: string;
   banner: string | null;
-  score: number | null; // 0 a 10
+  score: number | null; 
   rank: number | null;
   year: number | null;
   format: string | null;
@@ -228,11 +225,10 @@ async function gql<T>(
   return json.data as T;
 }
 
-// ---------- Busca genérica (base de quase todas as telas) ----------
 export type SearchParams = {
   type?: Kind;
-  sort?: string[]; // ex.: ['TRENDING_DESC']
-  status?: string; // ex.: 'RELEASING'
+  sort?: string[]; 
+  status?: string; 
   genre?: string;
   search?: string;
   page?: number;

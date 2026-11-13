@@ -1,10 +1,8 @@
-// Serviço da API Jikan (https://docs.api.jikan.moe) com fila, retry e cache.
-// Limite da API: 3 req/s e 60 req/min. A fila abaixo espaça as chamadas.
-
 const BASE_URL = 'https://api.jikan.moe/v4';
-const MIN_INTERVAL_MS = 400; // ~2,5 req/s, abaixo do limite
+const MIN_INTERVAL_MS = 400; 
 const MAX_RETRIES = 2;
-const CACHE_MS = 5 * 60 * 1000; // 5 minutos
+const CACHE_MS = 5 * 60 * 1000; 
+const TIMEOUT_MS = 8000;
 
 export type Anime = {
   mal_id: number;
@@ -53,9 +51,14 @@ async function apiGet<T>(path: string, attempt = 0): Promise<T> {
   await waitTurn();
 
   let res: Response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    res = await fetch(BASE_URL + path);
-  } catch {
+    res = await fetch(BASE_URL + path, { signal: controller.signal });
+    clearTimeout(timer);
+  } catch (e) {
+    clearTimeout(timer);
+    console.log('[Jikan] falha em', path, '(tentativa', attempt + 1, ')', String(e));
     if (attempt < MAX_RETRIES) {
       await sleep(1000);
       return apiGet<T>(path, attempt + 1);
@@ -64,6 +67,7 @@ async function apiGet<T>(path: string, attempt = 0): Promise<T> {
   }
 
   if (res.status === 429 || res.status >= 500) {
+    console.log('[Jikan] status', res.status, 'em', path);
     if (attempt < MAX_RETRIES) {
       await sleep(1000 * (attempt + 1));
       return apiGet<T>(path, attempt + 1);
