@@ -1,6 +1,5 @@
 // Serviço da API AniList (GraphQL, sem chave): https://docs.anilist.co
-// Os dados são convertidos para o tipo `Anime` abaixo, que as telas já usam.
-// Inclui fila (throttle), retry, timeout e cache.
+// Cobre animes e mangás. Inclui fila (throttle), retry, timeout e cache.
 
 const ENDPOINT = 'https://graphql.anilist.co';
 const MIN_INTERVAL_MS = 700; // limite da API: ~90 req/min
@@ -8,66 +7,101 @@ const MAX_RETRIES = 2;
 const TIMEOUT_MS = 10000;
 const CACHE_MS = 5 * 60 * 1000;
 
-export type Anime = {
-  mal_id: number; 
+export type Kind = 'ANIME' | 'MANGA';
+
+export type Titulo = {
+  id: number;
+  kind: Kind;
   title: string;
-  title_english: string | null;
-  images: { jpg: { image_url: string; large_image_url: string } };
+  titleEnglish: string | null;
+  cover: string;
+  coverLarge: string;
+  banner: string | null;
   score: number | null; // 0 a 10
   rank: number | null;
   year: number | null;
-  episodes: number | null;
-  type: string | null;
+  format: string | null;
   status: string | null;
+  episodes: number | null;
+  chapters: number | null;
+  volumes: number | null;
   synopsis: string | null;
-  genres: { mal_id: number; name: string }[];
-  studios: { mal_id: number; name: string }[];
-  trailer?: { url: string | null };
+  genres: string[];
+  studios: string[];
+  authors: string[];
+  trailerUrl: string | null;
   url: string;
 };
 
+export const nomeExibicao = (t: Titulo) => t.titleEnglish || t.title;
+export const kindLabel = (k: Kind) => (k === 'ANIME' ? 'Anime' : 'Mangá');
+
 type RawMedia = {
   id: number;
+  type: Kind;
+  isAdult: boolean | null;
+  popularity: number | null;
   title: { romaji: string | null; english: string | null };
   coverImage: { large: string | null; extraLarge: string | null };
+  bannerImage: string | null;
   averageScore: number | null;
-  rankings: { rank: number; type: string; allTime: boolean }[] | null;
   seasonYear: number | null;
   startDate: { year: number | null } | null;
-  episodes: number | null;
   format: string | null;
   status: string | null;
-  description: string | null;
-  genres: string[] | null;
-  studios: { nodes: { id: number; name: string }[] } | null;
-  trailer: { id: string | null; site: string | null } | null;
+  episodes: number | null;
+  chapters: number | null;
+  volumes: number | null;
   siteUrl: string;
+  description?: string | null;
+  genres?: string[] | null;
+  studios?: { nodes: { name: string }[] } | null;
+  staff?: { nodes: { name: { full: string } }[] } | null;
+  rankings?: { rank: number; type: string; allTime: boolean }[] | null;
+  trailer?: { id: string | null; site: string | null } | null;
 };
 
-const MEDIA_FIELDS = `
-  id
+const LIST_FIELDS = `
+  id type isAdult popularity
   title { romaji english }
   coverImage { large extraLarge }
+  bannerImage
   averageScore
-  rankings { rank type allTime }
   seasonYear
   startDate { year }
-  episodes
-  format
-  status
+  format status episodes chapters volumes
+  siteUrl
+`;
+
+const DETAIL_FIELDS = `
+  ${LIST_FIELDS}
   description(asHtml: false)
   genres
-  studios(isMain: true) { nodes { id name } }
+  studios(isMain: true) { nodes { name } }
+  staff(perPage: 3, sort: RELEVANCE) { nodes { name { full } } }
+  rankings { rank type allTime }
   trailer { id site }
-  siteUrl
 `;
 
 const STATUS_PT: Record<string, string> = {
   FINISHED: 'Finalizado',
-  RELEASING: 'Em exibição',
+  RELEASING: 'Em lançamento',
   NOT_YET_RELEASED: 'Em breve',
   CANCELLED: 'Cancelado',
   HIATUS: 'Em hiato',
+};
+
+const FORMAT_PT: Record<string, string> = {
+  TV: 'TV',
+  TV_SHORT: 'TV curto',
+  MOVIE: 'Filme',
+  SPECIAL: 'Especial',
+  OVA: 'OVA',
+  ONA: 'ONA',
+  MUSIC: 'Música',
+  MANGA: 'Mangá',
+  NOVEL: 'Novel',
+  ONE_SHOT: 'One-shot',
 };
 
 function cleanDescription(text: string | null): string | null {
@@ -90,26 +124,38 @@ function trailerUrl(t: RawMedia['trailer']): string | null {
   return null;
 }
 
-function toAnime(m: RawMedia): Anime {
-  const cover = m.coverImage.extraLarge || m.coverImage.large || '';
+function toTitulo(m: RawMedia): Titulo {
+  const large = m.coverImage.large || m.coverImage.extraLarge || '';
+  const xl = m.coverImage.extraLarge || large;
   const ranked = m.rankings?.find((r) => r.type === 'RATED' && r.allTime);
   return {
-    mal_id: m.id,
+    id: m.id,
+    kind: m.type,
     title: m.title.romaji || m.title.english || 'Sem título',
-    title_english: m.title.english,
-    images: { jpg: { image_url: m.coverImage.large || cover, large_image_url: cover } },
+    titleEnglish: m.title.english,
+    cover: large,
+    coverLarge: xl,
+    banner: m.bannerImage,
     score: m.averageScore != null ? m.averageScore / 10 : null,
     rank: ranked ? ranked.rank : null,
     year: m.seasonYear ?? m.startDate?.year ?? null,
-    episodes: m.episodes,
-    type: m.format ? m.format.replace(/_/g, ' ') : null,
+    format: m.format ? FORMAT_PT[m.format] ?? m.format.replace(/_/g, ' ') : null,
     status: m.status ? STATUS_PT[m.status] ?? m.status : null,
-    synopsis: cleanDescription(m.description),
-    genres: (m.genres ?? []).map((name, i) => ({ mal_id: i, name })),
-    studios: (m.studios?.nodes ?? []).map((s) => ({ mal_id: s.id, name: s.name })),
-    trailer: { url: trailerUrl(m.trailer) },
+    episodes: m.episodes,
+    chapters: m.chapters,
+    volumes: m.volumes,
+    synopsis: cleanDescription(m.description ?? null),
+    genres: m.genres ?? [],
+    studios: (m.studios?.nodes ?? []).map((s) => s.name),
+    authors: (m.staff?.nodes ?? []).map((s) => s.name.full),
+    trailerUrl: trailerUrl(m.trailer ?? null),
     url: m.siteUrl,
   };
+}
+
+function uniqueById<T extends { id: number }>(list: T[]): T[] {
+  const seen = new Set<number>();
+  return list.filter((x) => (seen.has(x.id) ? false : (seen.add(x.id), true)));
 }
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -182,36 +228,124 @@ async function gql<T>(
   return json.data as T;
 }
 
-export async function getTopAnime(limit = 10): Promise<Anime[]> {
-  const data = await gql<{ Page: { media: RawMedia[] } }>(
-    `query ($perPage: Int) {
-       Page(page: 1, perPage: $perPage) {
-         media(type: ANIME, sort: SCORE_DESC, isAdult: false) { ${MEDIA_FIELDS} }
+export type SearchParams = {
+  type?: Kind;
+  sort?: string[]; 
+  status?: string; 
+  genre?: string;
+  search?: string;
+  page?: number;
+  perPage?: number;
+  popularityGreater?: number;
+};
+
+export async function searchMedia(
+  p: SearchParams = {}
+): Promise<{ items: Titulo[]; hasNext: boolean }> {
+  const data = await gql<{
+    Page: { pageInfo: { hasNextPage: boolean }; media: RawMedia[] };
+  }>(
+    `query ($page: Int, $perPage: Int, $type: MediaType, $sort: [MediaSort],
+            $status: MediaStatus, $genre: String, $search: String, $pop: Int) {
+       Page(page: $page, perPage: $perPage) {
+         pageInfo { hasNextPage }
+         media(type: $type, sort: $sort, status: $status, genre: $genre,
+               search: $search, popularity_greater: $pop, isAdult: false) {
+           ${LIST_FIELDS}
+         }
        }
      }`,
-    { perPage: limit }
+    {
+      page: p.page ?? 1,
+      perPage: p.perPage ?? 20,
+      type: p.type,
+      sort: p.sort,
+      status: p.status,
+      genre: p.genre,
+      search: p.search,
+      pop: p.popularityGreater,
+    }
   );
-  return data.Page.media.map(toAnime);
+  return {
+    items: uniqueById(data.Page.media.map(toTitulo)),
+    hasNext: data.Page.pageInfo.hasNextPage,
+  };
 }
 
-export async function getSeasonNow(limit = 10): Promise<Anime[]> {
-  const data = await gql<{ Page: { media: RawMedia[] } }>(
-    `query ($perPage: Int) {
-       Page(page: 1, perPage: $perPage) {
-         media(type: ANIME, status: RELEASING, sort: POPULARITY_DESC, isAdult: false) { ${MEDIA_FIELDS} }
+export const getTrending = async (type: Kind, perPage = 12) =>
+  (await searchMedia({ type, sort: ['TRENDING_DESC'], perPage })).items;
+
+export const getTopRated = async (type: Kind, perPage = 12) =>
+  (await searchMedia({ type, sort: ['SCORE_DESC'], popularityGreater: 10000, perPage })).items;
+
+export const getPopular = async (type: Kind, perPage = 12) =>
+  (await searchMedia({ type, sort: ['POPULARITY_DESC'], perPage })).items;
+
+export const getRecentlyAdded = async (type: Kind, perPage = 12) =>
+  (await searchMedia({ type, sort: ['ID_DESC'], popularityGreater: 500, perPage })).items;
+
+export const getRecentlyUpdated = async (type: Kind, perPage = 12) =>
+  (
+    await searchMedia({
+      type,
+      sort: ['UPDATED_AT_DESC'],
+      status: 'RELEASING',
+      popularityGreater: 2000,
+      perPage,
+    })
+  ).items;
+
+export async function getNewEpisodes(limit = 12): Promise<{ titulo: Titulo; episode: number }[]> {
+  const hour = Math.floor(Date.now() / 3600000) * 3600; // arredonda p/ aproveitar o cache
+  const data = await gql<{
+    Page: { airingSchedules: { episode: number; media: RawMedia }[] };
+  }>(
+    `query ($from: Int, $to: Int) {
+       Page(page: 1, perPage: 50) {
+         airingSchedules(airingAt_greater: $from, airingAt_lesser: $to, sort: TIME_DESC) {
+           episode
+           media { ${LIST_FIELDS} }
+         }
        }
      }`,
-    { perPage: limit }
+    { from: hour - 3 * 24 * 3600, to: hour }
   );
-  return data.Page.media.map(toAnime);
+  const items = data.Page.airingSchedules
+    .filter((s) => s.media && !s.media.isAdult)
+    .sort((a, b) => (b.media.popularity ?? 0) - (a.media.popularity ?? 0));
+  return uniqueById(items.map((s) => ({ id: s.media.id, titulo: toTitulo(s.media), episode: s.episode })))
+    .slice(0, limit)
+    .map(({ titulo, episode }) => ({ titulo, episode }));
 }
 
-export async function getAnimeById(id: number | string): Promise<Anime> {
+export async function getGenreCovers(genres: string[], type: Kind): Promise<Record<string, string>> {
+  try {
+    const body = genres
+      .map(
+        (g, i) =>
+          `g${i}: Page(perPage: 1) { media(genre: ${JSON.stringify(g)}, type: ${type}, sort: POPULARITY_DESC, isAdult: false) { coverImage { large } } }`
+      )
+      .join('\n');
+    const data = await gql<Record<string, { media: { coverImage: { large: string | null } }[] }>>(
+      `query { ${body} }`,
+      {}
+    );
+    const out: Record<string, string> = {};
+    genres.forEach((g, i) => {
+      const url = data[`g${i}`]?.media?.[0]?.coverImage?.large;
+      if (url) out[g] = url;
+    });
+    return out;
+  } catch (e) {
+    console.log('[AniList] capas dos gêneros indisponíveis', String(e));
+    return {};
+  }
+}
+
+export async function getTitulo(id: number | string): Promise<Titulo> {
   const data = await gql<{ Media: RawMedia }>(
-    `query ($id: Int) {
-       Media(id: $id, type: ANIME) { ${MEDIA_FIELDS} }
-     }`,
+    `query ($id: Int) { Media(id: $id) { ${DETAIL_FIELDS} } }`,
     { id: Number(id) }
   );
-  return toAnime(data.Media);
+  return toTitulo(data.Media);
 }
