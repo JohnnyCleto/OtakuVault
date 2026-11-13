@@ -1,162 +1,156 @@
-
-import { ReactElement, useCallback, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Platform,
+  Image,
   Pressable,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import type { AsyncState } from '../hooks/useAsync';
+import FilterChips, { Filter } from '../components/FilterChips';
+import TituloRow from '../components/TituloRow';
+import { GENRES } from '../genres';
+import { useAsync } from '../hooks/useAsync';
+import { openCategoria } from '../navigation';
+import { getGenreCovers, searchMedia } from '../services/anilist';
 import { colors } from '../theme';
 
-type CarouselProps<T> = {
-  title: string;
-  state: AsyncState<T[]>;
-  keyOf: (item: T) => string;
-  renderItem: (item: T) => ReactElement;
-};
+export default function BuscaScreen() {
+  const insets = useSafeAreaInsets();
+  const [text, setText] = useState('');
+  const [debounced, setDebounced] = useState('');
+  const [filter, setFilter] = useState<Filter>('TUDO');
 
-export default function Carousel<T>({
-  title,
-  state,
-  keyOf,
-  renderItem,
-}: CarouselProps<T>) {
-  const listRef = useRef<FlatList<T>>(null);
-  const offset = useRef(0);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(text.trim()), 500);
+    return () => clearTimeout(t);
+  }, [text]);
 
-  const scrollBy = useCallback((delta: number) => {
-    listRef.current?.scrollToOffset({
-      offset: Math.max(0, offset.current + delta),
-      animated: true,
-    });
-  }, []);
+  const searching = text.trim().length >= 2;
+  const type = filter === 'TUDO' ? undefined : filter;
+  const coverType = filter === 'MANGA' ? 'MANGA' : 'ANIME';
 
-  const renderListItem = useCallback(
-    ({ item }: { item: T }) => renderItem(item),
-    [renderItem]
+  const results = useAsync(
+    () => (debounced.length >= 2 ? searchMedia({ search: debounced, type, perPage: 25 }) : Promise.resolve(null)),
+    [debounced, filter]
+  );
+  const covers = useAsync(
+    () => getGenreCovers(GENRES.map((g) => g.value), coverType),
+    [coverType]
   );
 
-  if (typeof renderItem !== 'function') {
-    console.error(
-      `Carousel "${title}": renderItem precisa ser uma função.`
+  const topBar = (
+    <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+      <Pressable hitSlop={10} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={26} color={colors.text} />
+      </Pressable>
+      <View style={styles.inputBox}>
+        <Ionicons name="search" size={20} color={colors.textMuted} />
+        <TextInput
+          style={styles.input}
+          placeholder="O que está procurando?"
+          placeholderTextColor={colors.textMuted}
+          value={text}
+          onChangeText={setText}
+          autoFocus
+          returnKeyType="search"
+        />
+        {text !== '' && (
+          <Pressable hitSlop={10} onPress={() => setText('')}>
+            <Ionicons name="close-circle" size={20} color={colors.textMuted} />
+          </Pressable>
+        )}
+      </View>
+    </View>
+  );
+
+  const chips = (
+    <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+      <FilterChips value={filter} onChange={setFilter} />
+    </View>
+  );
+
+  if (searching) {
+    const items = results.data?.items ?? [];
+    return (
+      <View style={styles.screen}>
+        {topBar}
+        <FlatList
+          data={items}
+          keyExtractor={(t) => String(t.id)}
+          keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={chips}
+          renderItem={({ item }) => <TituloRow titulo={item} />}
+          ListEmptyComponent={
+            results.loading ? (
+              <ActivityIndicator style={{ marginTop: 40 }} color={colors.accent} />
+            ) : results.error ? (
+              <Text style={styles.message}>{results.error}</Text>
+            ) : (
+              <Text style={styles.message}>Nenhum resultado para "{debounced}".</Text>
+            )
+          }
+        />
+      </View>
     );
-    return null;
   }
 
   return (
-    <View style={styles.section}>
-      <Text style={styles.title}>{title}</Text>
-
-      {state.loading && !state.data ? (
-        <View style={styles.box}>
-          <ActivityIndicator color={colors.accent} />
-        </View>
-      ) : state.error ? (
-        <View style={styles.box}>
-          <Text style={styles.error}>{state.error}</Text>
-
-          <Pressable style={styles.retry} onPress={state.reload}>
-            <Text style={styles.retryText}>Tentar de novo</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <View>
-          <FlatList<T>
-            ref={listRef}
-            data={state.data ?? []}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            nestedScrollEnabled
-            directionalLockEnabled
-            decelerationRate="fast"
-            scrollEventThrottle={16}
-            onScroll={(e) => {
-              offset.current = e.nativeEvent.contentOffset.x;
-            }}
-            keyExtractor={keyOf}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
-            ItemSeparatorComponent={() => (
-              <View style={{ width: 12 }} />
-            )}
-            renderItem={renderListItem}
-          />
-
-          {Platform.OS === 'web' && (
-            <>
-              <Pressable
-                style={[styles.arrow, { left: 6 }]}
-                onPress={() => scrollBy(-320)}
-              >
-                <Ionicons
-                  name="chevron-back"
-                  size={24}
-                  color={colors.text}
-                />
-              </Pressable>
-
-              <Pressable
-                style={[styles.arrow, { right: 6 }]}
-                onPress={() => scrollBy(320)}
-              >
-                <Ionicons
-                  name="chevron-forward"
-                  size={24}
-                  color={colors.text}
-                />
-              </Pressable>
-            </>
-          )}
-        </View>
-      )}
+    <View style={styles.screen}>
+      {topBar}
+      <FlatList
+        data={GENRES}
+        numColumns={2}
+        keyExtractor={(g) => g.value}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+        columnWrapperStyle={{ gap: 12 }}
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+        ListHeaderComponent={
+          <View>
+            <View style={{ marginHorizontal: -16 }}>{chips}</View>
+            <Text style={styles.heading}>Categorias</Text>
+          </View>
+        }
+        renderItem={({ item }) => {
+          const cover = covers.data?.[item.value];
+          return (
+            <Pressable
+              style={[styles.tile, { backgroundColor: item.color }]}
+              onPress={() => openCategoria(item.value, item.label, filter)}
+            >
+              {cover && <Image source={{ uri: cover }} style={styles.tileImage} resizeMode="cover" />}
+              <Text style={styles.tileText}>{item.label}</Text>
+            </Pressable>
+          );
+        }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  section: {
-    marginBottom: 24,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    marginHorizontal: 16,
-    marginBottom: 12,
-  },
-  box: {
-    height: 120,
+  screen: { flex: 1, backgroundColor: colors.bg },
+  topBar: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingBottom: 14 },
+  inputBox: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
+    gap: 8,
+    backgroundColor: colors.surface,
+    borderRadius: 24,
+    paddingHorizontal: 14,
+    height: 46,
   },
-  error: {
-    color: colors.textMuted,
-    textAlign: 'center',
-  },
-  retry: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  retryText: {
-    color: colors.bg,
-    fontWeight: '700',
-  },
-  arrow: {
-    position: 'absolute',
-    top: 50,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(21,19,31,0.8)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  input: { flex: 1, color: colors.text, fontSize: 16 },
+  heading: { color: colors.text, fontSize: 28, fontWeight: '800', marginBottom: 14 },
+  tile: { flex: 1, height: 92, borderRadius: 14, overflow: 'hidden', justifyContent: 'center', paddingLeft: 14 },
+  tileImage: { position: 'absolute', right: 0, top: 0, bottom: 0, width: '48%', opacity: 0.9 },
+  tileText: { color: '#fff', fontSize: 17, fontWeight: '700', textShadowColor: 'rgba(0,0,0,0.5)', textShadowRadius: 4 },
+  message: { color: colors.textMuted, textAlign: 'center', marginTop: 40, paddingHorizontal: 24 },
 });
