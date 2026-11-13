@@ -1,56 +1,58 @@
-# Welcome to your Expo app 👋
+# ⛩️ OtakuVault
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> Um aplicativo mobile moderno desenvolvido em **React Native (Expo Go)** para gerenciamento de listas de animes e mangás, integrando a **AniList API** e persistência de dados local.
 
-## Get started
+---
 
-1. Install dependencies
+## 📱 Sobre o Projeto
+O **OtakuVault** é um aplicativo projetado para entusiastas da cultura otaku explorarem catálogos em tempo real, acompanharem lançamentos de episódios e gerenciarem suas próprias coleções de animes e mangás de forma fluida e intuitiva. 
 
+O projeto conta com arquitetura modular, Dark Mode nativo e navegação baseada em arquivos (`Expo Router`).
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+* **Framework:** React Native / Expo (SDK 58)
+* **Navegação:** Expo Router (File-based Routing & Bottom Tabs)
+* **Persistência Local:** AsyncStorage (Para perfil, configurações e favoritos salvos offline)
+* **API Externa:** [AniList GraphQL API](https://anilist.gitbook.io/anilist-apiv2-docs/)
+* **Estilização & Ícones:** StyleSheet nativo + `@expo/vector-icons`
+
+---
+
+## 📂 Arquitetura de Telas (As 12 Páginas do Sistema)
+
+O fluxo de navegação do aplicativo distribui-se entre abas principais e rotas empilhadas (Stack):
+
+### Navegação Principal (Abas)
+1. **Início (`/(tabs)/index`)** — Feed principal contendo seções de *Em alta*, *Novos episódios* e *Recém adicionados*.
+2. **Mangás (`/(tabs)/mangas`)** — Seção dedicada aos quadrinhos com abas para *Mais lidos*, *Recomendados* e *Recém atualizados*.
+3. **Favoritos / Minha Lista (`/(tabs)/favoritos`)** — Central de itens salvos com cartões de capa, ano, tags de tipo (*Anime/Mangá*), botão de exclusão rápida e filtro dinâmico (*Tudo / Animes / Mangás*).
+4. **Menu / Mais (`/(tabs)/mais`)** — Central de controle com card do usuário, atalhos para perfil, configurações, créditos e encerramento de sessão.
+
+### Rotas de Exploração e Detalhes
+5. **Busca e Categorias (`/busca`)** — Tela de pesquisa em tempo real combinada com uma grade colorida de gêneros.
+6. **Lista de Resultados / Categoria (`/categoria/[slug]`)** — Exibição filtrada de obras obtidas através da busca ou de um gênero selecionado.
+7. **Detalhes da Obra (`/anime/[id]`)** — Visão completa com sinopse, pontuação, estúdio, banner e botões de ação.
+8. **Lista de Personagens (`/personagens/[id]`)** — Exibição do elenco e personagens associados à obra.
+
+### Área do Usuário e Ajustes
+9. **Perfil do Usuário (`/perfil`)** — Tela de exibição com avatar personalizado, destaques de favoritos e data de cadastro (*Membro desde*).
+10. **Editar Perfil (`/editar-perfil`)** — Formulário para alteração de nome de usuário e biografia, sincronizado com o armazenamento local.
+11. **Configurações (`/configuracoes`)** — Painel de ajustes gerais do app, incluindo a opção de limpar dados e favoritos salvos.
+12. **Login e Cadastro (`/login`)** — Tela inicial de autenticação simulada para identificação de sessão no dispositivo.
+
+---
+
+## 🚀 Como Executar o Projeto Localmente
+
+Siga os passos abaixo para clonar e testar o **OtakuVault** no seu celular via **Expo Go**:
+
+### Pré-requisitos
+* Node.js instalado na máquina.
+* Aplicativo **Expo Go** instalado no seu smartphone (Android ou iOS).
+
+### Passo a Passo
+1. Clone este repositório:
    ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+   git clone [https://github.com/SEU-USUARIO/OtakuVault.git](https://github.com/SEU-USUARIO/OtakuVault.git)
