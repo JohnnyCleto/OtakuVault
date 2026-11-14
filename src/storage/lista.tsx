@@ -40,6 +40,7 @@ type ListaValue = {
   entries: Entry[];
   getStatus: (id: number) => StatusKey | null;
   setStatus: (titulo: Titulo, status: StatusKey | null) => Promise<void>;
+  clear: () => Promise<void>;
 };
 
 const ListaContext = createContext<ListaValue | null>(null);
@@ -71,10 +72,15 @@ export function ListaProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem(key, JSON.stringify(next));
   }
 
+  async function clear() {
+    setEntries([]);
+    await AsyncStorage.removeItem(key);
+  }
+
   const getStatus = (id: number) => entries.find((e) => e.titulo.id === id)?.status ?? null;
 
   return (
-    <ListaContext.Provider value={{ entries, getStatus, setStatus }}>
+    <ListaContext.Provider value={{ entries, getStatus, setStatus, clear }}>
       {children}
     </ListaContext.Provider>
   );

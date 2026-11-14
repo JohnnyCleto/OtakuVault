@@ -293,7 +293,7 @@ export const getRecentlyUpdated = async (type: Kind, perPage = 12) =>
   ).items;
 
 export async function getNewEpisodes(limit = 12): Promise<{ titulo: Titulo; episode: number }[]> {
-  const hour = Math.floor(Date.now() / 3600000) * 3600; // arredonda p/ aproveitar o cache
+  const hour = Math.floor(Date.now() / 3600000) * 3600;
   const data = await gql<{
     Page: { airingSchedules: { episode: number; media: RawMedia }[] };
   }>(
@@ -403,4 +403,8 @@ export async function getPersonagens(id: number | string, perPage = 30): Promise
       voiceActor: e.voiceActors?.[0]?.name.full ?? null,
     }))
   );
+}
+
+export function clearCache() {
+  cache.clear();
 }

@@ -8,6 +8,7 @@ type FavoritesValue = {
   favorites: Titulo[];
   isFavorite: (id: number) => boolean;
   toggle: (titulo: Titulo) => Promise<void>;
+  clear: () => Promise<void>;
 };
 
 const FavoritesContext = createContext<FavoritesValue | null>(null);
@@ -37,10 +38,15 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem(key, JSON.stringify(next));
   }
 
+  async function clear() {
+    setFavorites([]);
+    await AsyncStorage.removeItem(key);
+  }
+
   const isFavorite = (id: number) => favorites.some((f) => f.id === id);
 
   return (
-    <FavoritesContext.Provider value={{ favorites, isFavorite, toggle }}>
+    <FavoritesContext.Provider value={{ favorites, isFavorite, toggle, clear }}>
       {children}
     </FavoritesContext.Provider>
   );

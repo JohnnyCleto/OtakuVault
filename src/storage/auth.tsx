@@ -17,6 +17,9 @@ type AuthValue = {
   register: (name: string, email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (name: string, bio: string) => Promise<void>;
+  changePassword: (current: string, next: string) => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 const USERS_KEY = 'users';
@@ -36,7 +39,6 @@ const publicUser = (u: StoredUser): User => ({
   bio: u.bio,
 });
 
-// Nunca salvamos a senha em texto puro: só o hash (SHA-256 + e-mail como "sal").
 function hashPassword(email: string, password: string) {
   return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, `${email}:${password}`);
 }
@@ -98,8 +100,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  async function updateProfile(name: string, bio: string) {
+    if (!user) throw new Error('Você precisa estar logado.');
+    if (!name.trim()) throw new Error('O nome não pode ficar vazio.');
+    const users = await readUsers();
+    const stored = users[user.email];
+    if (!stored) throw new Error('Conta não encontrada.');
+    stored.name = name.trim();
+    stored.bio = bio.trim().slice(0, 160);
+    await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+    setUser(publicUser(stored));
+  }
+
+  async function changePassword(current: string, next: string) {
+    if (!user) throw new Error('Você precisa estar logado.');
+    if (next.length < 6) throw new Error('A nova senha precisa ter pelo menos 6 caracteres.');
+    const users = await readUsers();
+    const stored = users[user.email];
+    if (!stored || stored.passwordHash !== (await hashPassword(user.email, current))) {
+      throw new Error('Senha atual incorreta.');
+    }
+    stored.passwordHash = await hashPassword(user.email, next);
+    await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+  }
+
+  async function deleteAccount() {
+    if (!user) return;
+    const users = await readUsers();
+    delete users[user.email];
+    await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+    await AsyncStorage.multiRemove([
+      SESSION_KEY,
+      `favorites_v2:${user.email}`,
+      `lista_v1:${user.email}`,
+    ]);
+    setUser(null);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, ready, register, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, ready, register, login, logout, updateProfile, changePassword, deleteAccount }}
+    >
       {children}
     </AuthContext.Provider>
   );
