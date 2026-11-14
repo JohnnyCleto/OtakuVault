@@ -1,10 +1,10 @@
-# Hoshi: catálogo de animes e mangás
+# OtakuVault: catálogo de animes e mangás
 
 Aplicativo mobile feito com **React Native + Expo (Expo Go)** para descobrir animes e mangás, salvar favoritos e organizar o que você está assistindo, completou, dropou ou não recomenda. Os dados vêm da **API pública da AniList**, sem necessidade de chave.
 
 Projeto acadêmico da disciplina de aplicativos nativos.
 
-> O nome "Hoshi" está definido em `src/theme.ts` (`APP_NAME`) e pode ser trocado em um só lugar.
+> O nome "OtakuVault" está definido em `src/theme.ts` (`APP_NAME`) e pode ser trocado em um só lugar.
 
 ---
 
