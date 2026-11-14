@@ -346,3 +346,61 @@ export async function getTitulo(id: number | string): Promise<Titulo> {
   );
   return toTitulo(data.Media);
 }
+
+export type Personagem = {
+  id: number;
+  name: string;
+  nameNative: string | null;
+  image: string;
+  role: 'MAIN' | 'SUPPORTING' | 'BACKGROUND' | string;
+  voiceActor: string | null; 
+};
+
+export const ROLE_PT: Record<string, string> = {
+  MAIN: 'Principal',
+  SUPPORTING: 'Coadjuvante',
+  BACKGROUND: 'Figurante',
+};
+
+export async function getPersonagens(id: number | string, perPage = 30): Promise<Personagem[]> {
+  const data = await gql<{
+    Media: {
+      characters: {
+        edges: {
+          role: string;
+          node: {
+            id: number;
+            name: { full: string | null; native: string | null };
+            image: { large: string | null };
+          };
+          voiceActors: { name: { full: string | null } }[] | null;
+        }[];
+      } | null;
+    };
+  }>(
+    `query ($id: Int, $perPage: Int) {
+       Media(id: $id) {
+         characters(perPage: $perPage, sort: [ROLE, RELEVANCE, ID]) {
+           edges {
+             role
+             node { id name { full native } image { large } }
+             voiceActors(language: JAPANESE) { name { full } }
+           }
+         }
+       }
+     }`,
+    { id: Number(id), perPage }
+  );
+
+  const edges = data.Media.characters?.edges ?? [];
+  return uniqueById(
+    edges.map((e) => ({
+      id: e.node.id,
+      name: e.node.name.full ?? 'Sem nome',
+      nameNative: e.node.name.native,
+      image: e.node.image.large ?? '',
+      role: e.role,
+      voiceActor: e.voiceActors?.[0]?.name.full ?? null,
+    }))
+  );
+}

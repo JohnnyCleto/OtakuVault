@@ -7,9 +7,11 @@ import { colors } from '../theme';
 export default function TituloRow({
   titulo,
   onRemove,
+  extraTag,
 }: {
   titulo: Titulo;
   onRemove?: () => void;
+  extraTag?: { label: string; color: string };
 }) {
   const info = [titulo.year, titulo.format].filter(Boolean).join(' | ');
 
@@ -31,8 +33,15 @@ export default function TituloRow({
             <Text style={styles.meta}>{titulo.score.toFixed(1)}</Text>
           </View>
         )}
-        <View style={styles.tag}>
-          <Text style={styles.tagText}>{kindLabel(titulo.kind)}</Text>
+        <View style={styles.tags}>
+          <View style={styles.tag}>
+            <Text style={styles.tagText}>{kindLabel(titulo.kind)}</Text>
+          </View>
+          {extraTag && (
+            <View style={[styles.tag, { backgroundColor: extraTag.color }]}>
+              <Text style={styles.tagText}>{extraTag.label}</Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -58,13 +67,12 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 16, fontWeight: '700' },
   meta: { color: colors.textMuted, fontSize: 14 },
   score: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },
   tag: {
-    alignSelf: 'flex-start',
     backgroundColor: colors.accent,
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 3,
-    marginTop: 2,
   },
   tagText: { color: colors.bg, fontSize: 13, fontWeight: '700' },
 });

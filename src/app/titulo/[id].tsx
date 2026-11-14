@@ -1,16 +1,21 @@
+import { useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import StatusPicker from '../../components/StatusPicker';
 import { ErrorView, Loading } from '../../components/StateViews';
 import { useAsync } from '../../hooks/useAsync';
 import { openCategoria } from '../../navigation';
 import { getTitulo, nomeExibicao } from '../../services/anilist';
 import { useFavorites } from '../../storage/favorites';
+import { STATUS_COLOR, statusLabel, useLista } from '../../storage/lista';
 import { colors } from '../../theme';
 
 export default function TituloDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { isFavorite, toggle } = useFavorites();
+  const { getStatus, setStatus } = useLista();
+  const [pickerOpen, setPickerOpen] = useState(false);
   const state = useAsync(() => getTitulo(id), [id]);
 
   if (state.loading && !state.data) return <Loading />;
@@ -20,6 +25,7 @@ export default function TituloDetalheScreen() {
   const t = state.data;
   const isAnime = t.kind === 'ANIME';
   const fav = isFavorite(t.id);
+  const status = getStatus(t.id);
 
   const meta = [
     isAnime ? 'Anime' : 'Mangá',
@@ -83,6 +89,30 @@ export default function TituloDetalheScreen() {
         </Pressable>
       </View>
 
+      <Pressable
+        style={[styles.button, status ? { backgroundColor: STATUS_COLOR[status] } : styles.listBtn]}
+        onPress={() => setPickerOpen(true)}
+      >
+        <Ionicons
+          name={status ? 'checkmark-circle' : 'add-circle-outline'}
+          size={18}
+          color={status ? colors.bg : colors.accent}
+        />
+        <Text style={[styles.buttonText, !status && { color: colors.accent }]}>
+          {status ? statusLabel(status, t.kind) : 'Adicionar à minha lista'}
+        </Text>
+      </Pressable>
+      <StatusPicker
+        visible={pickerOpen}
+        kind={t.kind}
+        current={status}
+        onClose={() => setPickerOpen(false)}
+        onSelect={(s) => {
+          setStatus(t, s);
+          setPickerOpen(false);
+        }}
+      />
+
       <Text style={styles.heading}>Sinopse</Text>
       <Text style={styles.synopsis}>{t.synopsis || 'Este título ainda não tem sinopse.'}</Text>
 
@@ -111,6 +141,7 @@ const styles = StyleSheet.create({
   chipText: { color: colors.accent, fontSize: 13, fontWeight: '600' },
   actions: { flexDirection: 'row', gap: 10, marginTop: 8 },
   button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.accent, paddingVertical: 12, borderRadius: 10 },
+  listBtn: { borderWidth: 1, borderColor: colors.accent, backgroundColor: 'transparent' },
   outline: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.accent },
   buttonText: { color: colors.bg, fontWeight: '800', fontSize: 15 },
   heading: { color: colors.text, fontSize: 18, fontWeight: '800', marginTop: 8 },
