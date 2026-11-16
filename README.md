@@ -75,12 +75,16 @@ Projeto acadêmico da disciplina de aplicativos nativos.
 - Favoritos e lista são **separados por usuário**. Sem login, valem para o "visitante".
 
 ### Configurações
-- Ligar ou desligar a troca automática do carrossel.
-- Atualizar dados da API (limpar o cache).
-- Limpar favoritos e limpar a lista (com confirmação).
-- Sair da conta.
-- Excluir conta, o que apaga também favoritos e lista deste aparelho (com confirmação).
-- Informações sobre o app e a fonte dos dados.
+Aberta pela engrenagem do topo, com visual próprio (topo florido e botão de fechar).
+- **Atalhos**: *Recarregar* (limpa o cache e recarrega o app) e *Ir para Início*.
+- **Preferências** (interruptores salvos no aparelho):
+  - Carrossel automático do início.
+  - Bolinha de novidades no sininho.
+  - Salvar histórico dos títulos abertos.
+- **Dados**: atualizar dados da API e limpar favoritos, lista ou histórico (com confirmação).
+- **Dica** aleatória de uso do app.
+- **Conta**: editar perfil, sair e excluir conta (apaga também favoritos, lista e histórico).
+- **Sistema**: versão do app e fonte dos dados.
 
 ### Robustez
 - Cada seção carrega de forma independente, com indicador de carregamento e botão **"Tentar de novo"** em caso de erro.
