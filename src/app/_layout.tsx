@@ -32,6 +32,7 @@ export default function RootLayout() {
                 <Stack.Screen name="configuracoes" options={{ title: 'Configurações' }} />
                 <Stack.Screen name="login" options={{ title: 'Entrar' }} />
                 <Stack.Screen name="mais" options={{ title: 'Menu' }} />
+                <Stack.Screen name="notificacoes" options={{ title: 'Novidades' }} />
               </Stack>
             </HistoricoProvider>
           </ListaProvider>
