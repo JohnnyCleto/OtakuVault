@@ -1,4 +1,3 @@
-
 import { ReactElement, useCallback, useRef } from 'react';
 import {
   ActivityIndicator,
@@ -12,12 +11,15 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import type { AsyncState } from '../hooks/useAsync';
 import { colors } from '../theme';
+import SectionHeader from './SectionHeader';
 
 type CarouselProps<T> = {
   title?: string;
   state: AsyncState<T[]>;
   keyOf?: (item: T) => string;
   renderItem?: (item: T) => ReactElement;
+  badge?: string;
+  onSeeAll?: () => void;
 };
 
 export default function Carousel<T>({
@@ -25,6 +27,8 @@ export default function Carousel<T>({
   state,
   keyOf,
   renderItem,
+  badge,
+  onSeeAll,
 }: CarouselProps<T>) {
   const listRef = useRef<FlatList<T>>(null);
   const offset = useRef(0);
@@ -103,7 +107,7 @@ export default function Carousel<T>({
 
   return (
     <View style={styles.section}>
-      <Text style={styles.title}>{title}</Text>
+      <SectionHeader title={title} badge={badge} onSeeAll={onSeeAll} />
 
       {state.loading && !state.data ? (
         <View style={styles.box}>
@@ -189,14 +193,6 @@ export default function Carousel<T>({
 const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
-  },
-
-  title: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    marginHorizontal: 16,
-    marginBottom: 12,
   },
 
   list: {
