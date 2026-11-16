@@ -34,7 +34,7 @@ export default function AppHeader() {
           {temNovidade && <View style={styles.dot} />}
         </Pressable>
 
-        <Pressable style={styles.gear} accessibilityLabel="Menu" onPress={() => router.push('/mais')}>
+        <Pressable style={styles.gear} accessibilityLabel="Configurações" onPress={() => router.push('/configuracoes')}>
           <Ionicons name="settings-sharp" size={22} color={colors.text} />
         </Pressable>
       </View>
