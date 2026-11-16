@@ -73,7 +73,7 @@ export default function CategoriaScreen() {
                 <Text style={styles.moreText}>Carregar mais</Text>
               )}
             </Pressable>
-          ) : null
+          ) : undefined
         }
       />
     </View>
