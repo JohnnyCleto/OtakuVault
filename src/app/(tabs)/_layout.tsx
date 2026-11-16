@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   bg: { flex: 1, backgroundColor: colors.bg },
   labelBox: { alignItems: 'center', gap: 4, marginTop: 2 },
-  label: { fontSize: 12, fontWeight: '600' },
-  indicator: { height: 3, width: 36, borderRadius: 2, backgroundColor: 'transparent' },
+  label: { fontSize: 11, fontWeight: '600' },
+  indicator: { height: 3, width: 28, borderRadius: 2, backgroundColor: 'transparent' },
   indicatorActive: { backgroundColor: colors.accent },
 });
