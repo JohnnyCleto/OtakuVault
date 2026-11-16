@@ -27,8 +27,12 @@ export type Titulo = {
   studios: string[];
   authors: string[];
   trailerUrl: string | null;
+  ondeAssistir: LinkOficial[];
   url: string;
 };
+
+// Site oficial onde dá para assistir (anime) ou ler (mangá).
+export type LinkOficial = { site: string; url: string; language: string | null; color: string | null };
 
 export const nomeExibicao = (t: Titulo) => t.titleEnglish || t.title;
 export const kindLabel = (k: Kind) => (k === 'ANIME' ? 'Anime' : 'Mangá');
@@ -56,6 +60,9 @@ type RawMedia = {
   staff?: { nodes: { name: { full: string } }[] } | null;
   rankings?: { rank: number; type: string; allTime: boolean }[] | null;
   trailer?: { id: string | null; site: string | null } | null;
+  externalLinks?:
+    | { site: string; url: string | null; type: string | null; language: string | null; color: string | null; isDisabled: boolean | null }[]
+    | null;
 };
 
 const LIST_FIELDS = `
@@ -78,6 +85,7 @@ const DETAIL_FIELDS = `
   staff(perPage: 3, sort: RELEVANCE) { nodes { name { full } } }
   rankings { rank type allTime }
   trailer { id site }
+  externalLinks { site url type language color isDisabled }
 `;
 
 const STATUS_PT: Record<string, string> = {
@@ -121,6 +129,17 @@ function trailerUrl(t: RawMedia['trailer']): string | null {
   return null;
 }
 
+function linksStreaming(links: RawMedia['externalLinks']): LinkOficial[] {
+  const seen = new Set<string>();
+  return (links ?? [])
+    .filter((l) => l.type === 'STREAMING' && l.url && !l.isDisabled)
+    .filter((l) => {
+      const key = `${l.site}|${l.language ?? ''}`;
+      return seen.has(key) ? false : (seen.add(key), true);
+    })
+    .map((l) => ({ site: l.site, url: l.url as string, language: l.language, color: l.color }));
+}
+
 function toTitulo(m: RawMedia): Titulo {
   const large = m.coverImage.large || m.coverImage.extraLarge || '';
   const xl = m.coverImage.extraLarge || large;
@@ -146,6 +165,7 @@ function toTitulo(m: RawMedia): Titulo {
     studios: (m.studios?.nodes ?? []).map((s) => s.name),
     authors: (m.staff?.nodes ?? []).map((s) => s.name.full),
     trailerUrl: trailerUrl(m.trailer ?? null),
+    ondeAssistir: linksStreaming(m.externalLinks ?? null),
     url: m.siteUrl,
   };
 }
