@@ -34,12 +34,16 @@ export function statusLabel(status: StatusKey, kind: Kind): string {
   }
 }
 
-export type Entry = { titulo: Titulo; status: StatusKey; updatedAt: string };
+// progress = último episódio (anime) ou capítulo (mangá) visto. Opcional para
+// manter compatibilidade com listas salvas antes desse campo existir.
+export type Entry = { titulo: Titulo; status: StatusKey; updatedAt: string; progress?: number };
 
 type ListaValue = {
   entries: Entry[];
   getStatus: (id: number) => StatusKey | null;
   setStatus: (titulo: Titulo, status: StatusKey | null) => Promise<void>;
+  getProgress: (id: number) => number;
+  setProgress: (titulo: Titulo, progress: number) => Promise<void>;
   clear: () => Promise<void>;
 };
 
@@ -64,10 +68,29 @@ export function ListaProvider({ children }: { children: ReactNode }) {
   }, [key]);
 
   async function setStatus(titulo: Titulo, status: StatusKey | null) {
+    const current = entries.find((e) => e.titulo.id === titulo.id);
     const others = entries.filter((e) => e.titulo.id !== titulo.id);
     const next = status
-      ? [{ titulo, status, updatedAt: new Date().toISOString() }, ...others]
+      ? [{ titulo, status, updatedAt: new Date().toISOString(), progress: current?.progress }, ...others]
       : others;
+    await save(next);
+  }
+
+  async function setProgress(titulo: Titulo, progress: number) {
+    const total = titulo.kind === 'ANIME' ? titulo.episodes : titulo.chapters;
+    const value = Math.max(0, total ? Math.min(total, progress) : progress);
+    const current = entries.find((e) => e.titulo.id === titulo.id);
+    const others = entries.filter((e) => e.titulo.id !== titulo.id);
+    const entry: Entry = {
+      titulo,
+      status: current?.status ?? 'WATCHING',
+      updatedAt: new Date().toISOString(),
+      progress: value,
+    };
+    await save([entry, ...others]);
+  }
+
+  async function save(next: Entry[]) {
     setEntries(next);
     await AsyncStorage.setItem(key, JSON.stringify(next));
   }
@@ -78,9 +101,10 @@ export function ListaProvider({ children }: { children: ReactNode }) {
   }
 
   const getStatus = (id: number) => entries.find((e) => e.titulo.id === id)?.status ?? null;
+  const getProgress = (id: number) => entries.find((e) => e.titulo.id === id)?.progress ?? 0;
 
   return (
-    <ListaContext.Provider value={{ entries, getStatus, setStatus, clear }}>
+    <ListaContext.Provider value={{ entries, getStatus, setStatus, getProgress, setProgress, clear }}>
       {children}
     </ListaContext.Provider>
   );
