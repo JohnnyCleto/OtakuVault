@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import ProgressStepper from '../../components/ProgressStepper';
 import StatusPicker from '../../components/StatusPicker';
 import { ErrorView, Loading } from '../../components/StateViews';
 import { useAsync } from '../../hooks/useAsync';
@@ -15,7 +16,7 @@ import { colors } from '../../theme';
 export default function TituloDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { isFavorite, toggle } = useFavorites();
-  const { getStatus, setStatus } = useLista();
+  const { getStatus, setStatus, getProgress, setProgress } = useLista();
   const [pickerOpen, setPickerOpen] = useState(false);
   const state = useAsync(() => getTitulo(id), [id]);
   const { registrar } = useHistorico();
@@ -110,6 +111,9 @@ export default function TituloDetalheScreen() {
           {status ? statusLabel(status, t.kind) : 'Adicionar à minha lista'}
         </Text>
       </Pressable>
+      {status && (
+        <ProgressStepper titulo={t} value={getProgress(t.id)} onChange={(n) => setProgress(t, n)} />
+      )}
       <StatusPicker
         visible={pickerOpen}
         kind={t.kind}
