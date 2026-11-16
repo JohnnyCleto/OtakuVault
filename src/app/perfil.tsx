@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Avatar from '../components/Avatar';
 import { useAuth } from '../storage/auth';
 import { useFavorites } from '../storage/favorites';
 import { STATUS_COLOR, STATUS_ORDER, STATUS_SHORT, useLista } from '../storage/lista';
@@ -30,9 +31,9 @@ export default function PerfilScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.hero}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
-        </View>
+        <Pressable accessibilityLabel="Trocar foto de perfil" onPress={() => router.push('/escolher-avatar')}>
+          <Avatar user={user} size={88} />
+        </Pressable>
         <View style={{ flex: 1 }}>
           <Text style={styles.name}>{user.name}</Text>
           <Text style={styles.bio}>
@@ -87,8 +88,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   center: { alignItems: 'center', justifyContent: 'center', padding: 24, gap: 10 },
   hero: { flexDirection: 'row', alignItems: 'center', gap: 16, backgroundColor: colors.hero, padding: 20, paddingTop: 28, paddingBottom: 28 },
-  avatar: { width: 88, height: 88, borderRadius: 44, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: colors.bg, fontSize: 40, fontWeight: '800' },
   name: { color: colors.text, fontSize: 24, fontWeight: '800' },
   bio: { color: colors.textMuted, fontSize: 14 },
   stats: { flexDirection: 'row', gap: 8, padding: 16, paddingBottom: 12 },
