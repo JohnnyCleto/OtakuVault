@@ -31,7 +31,6 @@ export default function RootLayout() {
                 <Stack.Screen name="editar-perfil" options={{ title: 'Editar perfil' }} />
                 <Stack.Screen name="configuracoes" options={{ title: 'Configurações' }} />
                 <Stack.Screen name="login" options={{ title: 'Entrar' }} />
-                <Stack.Screen name="mais" options={{ title: 'Menu' }} />
                 <Stack.Screen name="notificacoes" options={{ title: 'Novidades' }} />
                 <Stack.Screen name="secao/[tipo]" options={{ title: 'Ver todos' }} />
                 <Stack.Screen name="escolher-avatar" options={{ title: 'Foto de perfil' }} />

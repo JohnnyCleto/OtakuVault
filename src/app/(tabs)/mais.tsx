@@ -2,11 +2,11 @@ import type { ComponentProps } from 'react';
 import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import Avatar from '../components/Avatar';
-import { APP_VERSION } from '../appInfo';
-import { useAuth } from '../storage/auth';
-import { confirmar } from '../utils/confirm';
-import { APP_NAME, colors, radius } from '../theme';
+import Avatar from '../../components/Avatar';
+import { APP_VERSION } from '../../appInfo';
+import { useAuth } from '../../storage/auth';
+import { confirmar } from '../../utils/confirm';
+import { APP_NAME, colors, radius } from '../../theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 type Item = { icon: IconName; title: string; sub: string; onPress: () => void };

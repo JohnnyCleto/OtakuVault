@@ -43,6 +43,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="favoritos" options={tab('Favoritos', 'heart', 'heart-outline')} />
       <Tabs.Screen name="minha-lista" options={tab('Minha Lista', 'list', 'list-outline')} />
       <Tabs.Screen name="historico" options={tab('Histórico', 'time', 'time-outline')} />
+      <Tabs.Screen name="mais" options={tab('Perfil', 'person', 'person-outline')} />
     </Tabs>
   );
 }
