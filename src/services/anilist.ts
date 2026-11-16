@@ -74,7 +74,6 @@ const LIST_FIELDS = `
 const DETAIL_FIELDS = `
   ${LIST_FIELDS}
   description(asHtml: false)
-  genres
   studios(isMain: true) { nodes { name } }
   staff(perPage: 3, sort: RELEVANCE) { nodes { name { full } } }
   rankings { rank type allTime }
