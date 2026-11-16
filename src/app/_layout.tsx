@@ -29,7 +29,7 @@ export default function RootLayout() {
                 <Stack.Screen name="personagens/[id]" options={{ title: 'Personagens' }} />
                 <Stack.Screen name="perfil" options={{ title: 'Perfil' }} />
                 <Stack.Screen name="editar-perfil" options={{ title: 'Editar perfil' }} />
-                <Stack.Screen name="configuracoes" options={{ title: 'Configurações' }} />
+                <Stack.Screen name="configuracoes" options={{ headerShown: false, animation: 'slide_from_bottom' }} />
                 <Stack.Screen name="login" options={{ title: 'Entrar' }} />
                 <Stack.Screen name="notificacoes" options={{ title: 'Novidades' }} />
                 <Stack.Screen name="secao/[tipo]" options={{ title: 'Ver todos' }} />
