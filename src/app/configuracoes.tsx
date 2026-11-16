@@ -4,6 +4,7 @@ import { DevSettings, Platform, Pressable, ScrollView, StyleSheet, Switch, Text,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Sakura from '../components/Sakura';
 import { APP_VERSION } from '../appInfo';
 import { clearCache } from '../services/anilist';
 import { useAuth } from '../storage/auth';
@@ -16,13 +17,13 @@ import { confirmar } from '../utils/confirm';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-// Flores decorativas no topo e no cartão de dica.
+// Flores decorativas no topo. Ficam longe do canto direito
+// para não encostar no botão de fechar.
 const PETALAS_TOPO = [
-  { top: -10, right: -8, size: 70, opacity: 0.5 },
-  { top: 40, right: 70, size: 26, opacity: 0.35 },
-  { top: 8, left: '40%', size: 18, opacity: 0.3 },
-  { top: 96, right: 18, size: 22, opacity: 0.3 },
-  { top: 70, left: -6, size: 34, opacity: 0.25 },
+  { top: -14, right: 76, size: 44, opacity: 0.35 },
+  { top: 44, right: 120, size: 16, opacity: 0.3 },
+  { top: -4, left: '42%', size: 18, opacity: 0.25 },
+  { top: 64, left: -8, size: 30, opacity: 0.2 },
 ] as const;
 
 const DICAS = [
@@ -108,12 +109,11 @@ export default function ConfiguracoesScreen() {
           ))}
         </View>
         {PETALAS_TOPO.map((p, i) => (
-          <Ionicons
+          <Sakura
             key={i}
-            name="flower"
             size={p.size}
-            color={colors.accent}
-            style={[styles.abs, { top: p.top + insets.top, opacity: p.opacity }, 'left' in p ? { left: p.left } : { right: p.right }]}
+            opacity={p.opacity}
+            style={[styles.abs, { top: p.top + insets.top }, 'left' in p ? { left: p.left } : { right: p.right }]}
           />
         ))}
 
@@ -138,7 +138,7 @@ export default function ConfiguracoesScreen() {
           <ActionCard
             icon="home"
             title="Ir para Início"
-            sub="Voltar para a tela inicial"
+            sub="Tela inicial"
             onPress={() => router.navigate('/')}
             highlight
           />
@@ -214,8 +214,8 @@ export default function ConfiguracoesScreen() {
         </Section>
 
         <View style={styles.tip}>
-          <Ionicons name="flower" size={44} color={colors.accent} style={[styles.abs, { right: 10, top: 6, opacity: 0.35 }]} />
-          <Ionicons name="flower" size={18} color={colors.accent} style={[styles.abs, { right: 60, bottom: 8, opacity: 0.3 }]} />
+          <Sakura size={44} opacity={0.3} style={[styles.abs, { right: 10, top: 6 }]} />
+          <Sakura size={18} opacity={0.25} style={[styles.abs, { right: 60, bottom: 8 }]} />
           <View style={styles.tipIcon}>
             <Ionicons name="bulb" size={24} color={colors.accent} />
           </View>
