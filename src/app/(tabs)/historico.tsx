@@ -39,7 +39,7 @@ export default function HistoricoScreen() {
               <Text style={styles.clearText}>Limpar</Text>
             </Pressable>
           </View>
-        ) : null
+        ) : undefined
       }
       ListEmptyComponent={
         <View style={styles.empty}>
