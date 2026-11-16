@@ -1,9 +1,10 @@
 import type { ComponentProps } from 'react';
-import { ColorValue, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ColorValue, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AppHeader from '../../components/AppHeader';
+import { useAuth } from '../../storage/auth';
 import { colors } from '../../theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -27,6 +28,20 @@ const tab = (title: string, icon: IconName, iconOutline: IconName) => ({
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const { user, ready, visitante } = useAuth();
+
+  // Enquanto a sessão salva é lida, mostra só um carregando.
+  if (!ready) {
+    return (
+      <View style={[styles.bg, { alignItems: 'center', justifyContent: 'center' }]}>
+        <ActivityIndicator color={colors.accent} size="large" />
+      </View>
+    );
+  }
+
+  // Sem login (e sem ter escolhido entrar como visitante), o app abre na tela de entrada.
+  if (!user && !visitante) return <Redirect href="/login" />;
+
   return (
     <Tabs
       screenOptions={{

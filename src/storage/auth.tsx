@@ -16,6 +16,9 @@ export type User = { name: string; email: string; createdAt?: string; bio?: stri
 type AuthValue = {
   user: User | null;
   ready: boolean;
+  // true quando a pessoa escolheu "Continuar sem conta" nesta abertura do app.
+  visitante: boolean;
+  continuarComoVisitante: () => void;
   register: (name: string, email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -50,6 +53,8 @@ function hashPassword(email: string, password: string) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  // Não é salvo de propósito: a cada abertura, quem não tem login vê a tela de entrada.
+  const [visitante, setVisitante] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -102,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function logout() {
     await AsyncStorage.removeItem(SESSION_KEY);
     setUser(null);
+    setVisitante(false);
   }
 
   async function updateProfile(name: string, bio: string) {
@@ -151,11 +157,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       `historico_v1:${user.email}`,
     ]);
     setUser(null);
+    setVisitante(false);
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, ready, register, login, logout, updateProfile, updateAvatar, changePassword, deleteAccount }}
+      value={{ user, ready, visitante, continuarComoVisitante: () => setVisitante(true), register, login, logout, updateProfile, updateAvatar, changePassword, deleteAccount }}
     >
       {children}
     </AuthContext.Provider>
