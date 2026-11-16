@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import TituloRow from '../components/TituloRow';
-import { STATUS_COLOR, STATUS_ORDER, STATUS_SHORT, StatusKey, statusLabel, useLista } from '../storage/lista';
-import { colors } from '../theme';
+import TituloRow from '../../components/TituloRow';
+import { STATUS_COLOR, STATUS_ORDER, STATUS_SHORT, StatusKey, statusLabel, useLista } from '../../storage/lista';
+import { colors } from '../../theme';
 
 type F = 'TODOS' | StatusKey;
 

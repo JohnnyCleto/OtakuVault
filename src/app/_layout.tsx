@@ -27,7 +27,6 @@ export default function RootLayout() {
                 <Stack.Screen name="titulo/[id]" options={{ title: 'Detalhes' }} />
                 <Stack.Screen name="categoria/[nome]" options={{ title: 'Categoria' }} />
                 <Stack.Screen name="personagens/[id]" options={{ title: 'Personagens' }} />
-                <Stack.Screen name="minha-lista" options={{ title: 'Minha lista' }} />
                 <Stack.Screen name="perfil" options={{ title: 'Perfil' }} />
                 <Stack.Screen name="editar-perfil" options={{ title: 'Editar perfil' }} />
                 <Stack.Screen name="configuracoes" options={{ title: 'Configurações' }} />
