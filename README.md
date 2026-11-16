@@ -40,9 +40,12 @@ Projeto acadêmico da disciplina de aplicativos nativos.
   - Grade de **12 categorias** (Aventura, Ação, Comédia, Drama, Fantasia, Romance, Slice of Life, Sobrenatural, Sci-Fi, Mistério, Esportes e Terror), cada uma com a capa de um título popular do gênero.
 - **Lista por categoria** com paginação ("Carregar mais").
 - **Detalhes** de qualquer anime ou mangá:
-  - Capa, título (inglês e original), nota, posição no ranking, formato, ano, status, episódios ou capítulos e volumes.
-  - Gêneros clicáveis, que levam à lista da categoria.
-  - Estúdio (anime) ou autoria (mangá), sinopse e link para o trailer, quando existir.
+  - Banner no topo com a capa por cima, título (inglês e original), nota, posição no ranking, formato, ano e status.
+  - Botões de **salvar na lista** (marcador) e **compartilhar**.
+  - Gêneros clicáveis em português, que levam à lista da categoria.
+  - Botão **Assistir** (ou **Ler**, para mangás): abre a janela "Onde assistir" com os sites oficiais informados pela AniList (Crunchyroll, Netflix, MANGA Plus...) e o trailer, quando existir.
+  - Favoritar, ver personagens, adicionar à minha lista e marcar o episódio/capítulo atual.
+  - Sinopse e cartão de **Detalhes** com ano, episódios ou capítulos, status, estúdio ou autoria.
 - **Personagens** de cada título, com foto, nome, nome original, papel (Principal, Coadjuvante ou Figurante) e dublador japonês (animes).
 
 ### Carrossel
@@ -216,6 +219,8 @@ src/
 │   ├── ContinueCard.tsx         # Card de "Continue assistindo"
 │   ├── EpisodeCard.tsx          # Card de episódio novo com menu de ações
 │   ├── ProgressStepper.tsx      # Controle de episódio/capítulo atual
+│   ├── WatchSheet.tsx           # Janela "Onde assistir" com sites oficiais e trailer
+│   ├── Sakura.tsx               # Florzinha decorativa
 │   ├── Carousel.tsx             # Seção com lista horizontal e estados de carga/erro
 │   ├── TituloCard.tsx           # Card vertical (capa e título)
 │   ├── WideCard.tsx             # Card horizontal (banner e título)
