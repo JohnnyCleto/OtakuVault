@@ -25,11 +25,14 @@ Projeto acadêmico da disciplina de aplicativos nativos.
 ## Funcionalidades
 
 ### Descoberta de conteúdo
-- **Início** com quatro seções:
-  - *Em alta*: carrossel principal com banners.
-  - *Novos episódios*: episódios lançados nos últimos 3 dias, dos mais populares para os menos.
-  - *Recém adicionados*.
-  - *Mais bem avaliados*.
+- **Início**:
+  - Barra de **gêneros** (Todos, Ação, Romance, Fantasia e uma setinha com todos os outros) que filtra a página inteira.
+  - *Em alta*: carrossel principal com banners, selo, nota, ano e botão "Assistir".
+  - *Continue assistindo*: títulos marcados como "Assistindo", com o episódio atual e uma barra de progresso.
+  - *Novos episódios*: episódios lançados nos últimos 3 dias. Os da sua lista e dos seus favoritos aparecem primeiro, com um selo de contagem. Cada card tem um menu (⋮) para favoritar ou marcar como assistindo.
+  - *Recém adicionados* e *Mais bem avaliados*, cada um com "Ver todos" (lista paginada).
+- **Novidades** (sininho): episódios novos, separando os que você acompanha. A bolinha rosa aparece quando tem episódio novo de algo seu.
+- **Histórico**: os últimos 50 títulos abertos, com data e hora, botão para remover e para limpar tudo.
 - **Mangás** com quatro seções: os mais lidos no momento, mais bem avaliados, populares de todos os tempos e recém atualizados.
 - **Busca** em tela própria:
   - Campo de pesquisa com espera de 500 ms entre as teclas (debounce), para não gastar requisições.
@@ -86,23 +89,26 @@ Projeto acadêmico da disciplina de aplicativos nativos.
 
 ## Telas do aplicativo
 
-O app tem **13 telas**: 4 abas e 9 telas de navegação.
+O app tem **16 telas**: 5 abas e 11 telas de navegação.
 
 | # | Tela | Rota | Origem dos dados |
 |---|------|------|------------------|
-| 1 | Início | `(tabs)/index` | AniList |
+| 1 | Início | `(tabs)/index` | AniList + AsyncStorage |
 | 2 | Mangás | `(tabs)/mangas` | AniList |
 | 3 | Favoritos | `(tabs)/favoritos` | AsyncStorage |
-| 4 | Mais (menu) | `(tabs)/mais` | AsyncStorage |
-| 5 | Busca e categorias | `busca` | AniList |
-| 6 | Lista da categoria | `categoria/[nome]` | AniList |
-| 7 | Detalhes do título | `titulo/[id]` | AniList |
-| 8 | Personagens | `personagens/[id]` | AniList |
-| 9 | Minha lista | `minha-lista` | AsyncStorage |
-| 10 | Perfil | `perfil` | AsyncStorage |
-| 11 | Editar perfil | `editar-perfil` | AsyncStorage |
-| 12 | Configurações | `configuracoes` | AsyncStorage |
-| 13 | Login e cadastro | `login` | AsyncStorage |
+| 4 | Minha lista | `(tabs)/minha-lista` | AsyncStorage |
+| 5 | Histórico | `(tabs)/historico` | AsyncStorage |
+| 6 | Menu (engrenagem) | `mais` | AsyncStorage |
+| 7 | Novidades (sininho) | `notificacoes` | AniList + AsyncStorage |
+| 8 | Ver todos | `secao/[tipo]` | AniList |
+| 9 | Busca e categorias | `busca` | AniList |
+| 10 | Lista da categoria | `categoria/[nome]` | AniList |
+| 11 | Detalhes do título | `titulo/[id]` | AniList |
+| 12 | Personagens | `personagens/[id]` | AniList |
+| 13 | Perfil | `perfil` | AsyncStorage |
+| 14 | Editar perfil | `editar-perfil` | AsyncStorage |
+| 15 | Configurações | `configuracoes` | AsyncStorage |
+| 16 | Login e cadastro | `login` | AsyncStorage |
 
 As rotas com colchetes (`[id]`, `[nome]`) são **rotas dinâmicas**: recebem um parâmetro pela navegação.
 
@@ -169,33 +175,40 @@ Depois, abra o **Expo Go** no celular e leia o QR code que aparece no terminal.
 src/
 ├── app/                         # Telas e rotas (Expo Router)
 │   ├── _layout.tsx              # Layout raiz: providers e pilha de navegação
-│   ├── (tabs)/                  # Grupo das 4 abas
+│   ├── (tabs)/                  # Grupo das 5 abas
 │   │   ├── _layout.tsx          # Barra de abas e cabeçalho (AppHeader)
-│   │   ├── index.tsx            # Início
+│   │   ├── index.tsx            # Início (gêneros, em alta, continue assistindo...)
 │   │   ├── mangas.tsx           # Mangás
 │   │   ├── favoritos.tsx        # Favoritos
-│   │   └── mais.tsx             # Menu "Mais"
+│   │   ├── minha-lista.tsx      # Lista por status
+│   │   └── historico.tsx        # Títulos vistos recentemente
+│   ├── mais.tsx                 # Menu aberto pela engrenagem
+│   ├── notificacoes.tsx         # Novidades (episódios novos)
+│   ├── secao/[tipo].tsx         # Ver todos de uma seção do início
 │   ├── busca.tsx                # Busca + grade de categorias
 │   ├── categoria/[nome].tsx     # Lista de uma categoria (gênero)
 │   ├── titulo/[id].tsx          # Detalhes de anime ou mangá
 │   ├── personagens/[id].tsx     # Personagens de um título
-│   ├── minha-lista.tsx          # Lista por status
 │   ├── perfil.tsx               # Perfil do usuário
 │   ├── editar-perfil.tsx        # Edição de nome, bio e senha
 │   ├── configuracoes.tsx        # Configurações do app
 │   └── login.tsx                # Login e cadastro
 │
 ├── components/                  # Componentes reutilizáveis
-│   ├── AppHeader.tsx            # Cabeçalho: logo, busca e avatar
+│   ├── AppHeader.tsx            # Cabeçalho: logo, busca, novidades e menu
+│   ├── GenreChips.tsx           # Barra de gêneros do início
+│   ├── SectionHeader.tsx        # Título de seção com selo e "Ver todos"
 │   ├── HeroCarousel.tsx         # Carrossel principal (arrasta, encaixa, autoplay)
+│   ├── ContinueCard.tsx         # Card de "Continue assistindo"
+│   ├── EpisodeCard.tsx          # Card de episódio novo com menu de ações
+│   ├── ProgressStepper.tsx      # Controle de episódio/capítulo atual
 │   ├── Carousel.tsx             # Seção com lista horizontal e estados de carga/erro
 │   ├── TituloCard.tsx           # Card vertical (capa e título)
 │   ├── WideCard.tsx             # Card horizontal (banner e título)
 │   ├── TituloRow.tsx            # Linha de lista (capa, dados e etiquetas)
 │   ├── FilterChips.tsx          # Filtro Tudo / Animes / Mangás
 │   ├── StatusPicker.tsx         # Janela para escolher o status na lista
-│   ├── StateViews.tsx           # Telas de carregando e de erro
-│   └── Placeholder.tsx          # Tela provisória (não é mais usada; pode apagar)
+│   └── StateViews.tsx           # Telas de carregando e de erro
 │
 ├── services/
 │   └── anilist.ts               # Cliente da API: fila, retry, timeout, cache e consultas
@@ -203,11 +216,13 @@ src/
 ├── storage/                     # Estado global salvo no aparelho (Context + AsyncStorage)
 │   ├── auth.tsx                 # Contas, login, sessão, perfil, senha
 │   ├── favorites.tsx            # Favoritos por usuário
-│   ├── lista.tsx                # Status dos títulos (Assistindo, Completo, ...)
+│   ├── lista.tsx                # Status e progresso dos títulos (Assistindo, Completo, ...)
+│   ├── historico.tsx            # Títulos vistos recentemente, por usuário
 │   └── settings.tsx             # Configurações do app
 │
 ├── hooks/
-│   └── useAsync.ts              # Hook que carrega dados e devolve data, loading, error e reload
+│   ├── useAsync.ts              # Hook que carrega dados e devolve data, loading, error e reload
+│   └── useNovidades.ts          # Episódios novos, separando os que o usuário acompanha
 │
 ├── utils/
 │   └── confirm.ts               # Confirmação "Tem certeza?" (celular e web)
@@ -222,7 +237,7 @@ src/
 ## Como o app funciona por dentro
 
 ### Navegação
-O **Expo Router** cria as rotas a partir dos arquivos em `src/app/`. A pasta `(tabs)` forma a barra inferior com 4 abas, e os demais arquivos são telas empilhadas por cima. Os arquivos `[id].tsx` e `[nome].tsx` recebem parâmetros lidos com `useLocalSearchParams`.
+O **Expo Router** cria as rotas a partir dos arquivos em `src/app/`. A pasta `(tabs)` forma a barra inferior com 5 abas, e os demais arquivos são telas empilhadas por cima. Os arquivos `[id].tsx` e `[nome].tsx` recebem parâmetros lidos com `useLocalSearchParams`.
 
 ### Consumo da API
 Todo o acesso à AniList passa por `src/services/anilist.ts`:
@@ -235,16 +250,17 @@ Todo o acesso à AniList passa por `src/services/anilist.ts`:
 As telas usam o hook `useAsync`, que executa a chamada, controla `loading` e `error` e oferece `reload`.
 
 ### Estado global
-Quatro **Contexts** do React, definidos em `src/storage/`, envolvem o app em `_layout.tsx`:
+Cinco **Contexts** do React, definidos em `src/storage/`, envolvem o app em `_layout.tsx`:
 
 ```
 SettingsProvider
   └─ AuthProvider
        └─ FavoritesProvider
             └─ ListaProvider
+                 └─ HistoricoProvider
 ```
 
-Favoritos e lista dependem do usuário logado, por isso ficam dentro do `AuthProvider`. Ao trocar de usuário, os dois recarregam os dados da conta nova.
+Favoritos, lista e histórico dependem do usuário logado, por isso ficam dentro do `AuthProvider`. Ao trocar de usuário, eles recarregam os dados da conta nova.
 
 ### Segurança do login
 O login é **simulado e local**, adequado para um trabalho acadêmico:
