@@ -69,7 +69,7 @@ Projeto acadêmico da disciplina de aplicativos nativos.
 - **Cadastro e login** com validação de campos (e-mail válido, senha com no mínimo 6 caracteres, e-mail único).
 - **Sessão persistente**: o app lembra quem está logado ao ser reaberto.
 - **Foto de perfil**: escolha qualquer personagem de anime como avatar (galeria com os mais populares da AniList e busca por nome). Sem foto, aparece a inicial do nome.
-- **Menu** (engrenagem): cartão com a foto, o nome e o e-mail de quem está logado, atalhos para perfil, lista, configurações, ajuda e sobre.
+- **Aba Perfil**: cartão com a foto, o nome e o e-mail de quem está logado, atalhos para perfil, lista, configurações, ajuda e sobre.
 - **Perfil**: avatar, contagem de favoritos, contadores da lista por status e data de cadastro ("Membro desde").
 - **Editar perfil**: altera nome e "sobre mim" (até 160 caracteres) e a senha.
 - Favoritos e lista são **separados por usuário**. Sem login, valem para o "visitante".
@@ -91,7 +91,7 @@ Projeto acadêmico da disciplina de aplicativos nativos.
 
 ## Telas do aplicativo
 
-O app tem **19 telas**: 5 abas e 14 telas de navegação.
+O app tem **19 telas**: 6 abas e 13 telas de navegação.
 
 | # | Tela | Rota | Origem dos dados |
 |---|------|------|------------------|
@@ -100,7 +100,7 @@ O app tem **19 telas**: 5 abas e 14 telas de navegação.
 | 3 | Favoritos | `(tabs)/favoritos` | AsyncStorage |
 | 4 | Minha lista | `(tabs)/minha-lista` | AsyncStorage |
 | 5 | Histórico | `(tabs)/historico` | AsyncStorage |
-| 6 | Menu (engrenagem) | `mais` | AsyncStorage |
+| 6 | Perfil (menu) | `(tabs)/mais` | AsyncStorage |
 | 7 | Novidades (sininho) | `notificacoes` | AniList + AsyncStorage |
 | 8 | Ver todos | `secao/[tipo]` | AniList |
 | 9 | Busca e categorias | `busca` | AniList |
@@ -180,14 +180,14 @@ Depois, abra o **Expo Go** no celular e leia o QR code que aparece no terminal.
 src/
 ├── app/                         # Telas e rotas (Expo Router)
 │   ├── _layout.tsx              # Layout raiz: providers e pilha de navegação
-│   ├── (tabs)/                  # Grupo das 5 abas
+│   ├── (tabs)/                  # Grupo das 6 abas
 │   │   ├── _layout.tsx          # Barra de abas e cabeçalho (AppHeader)
 │   │   ├── index.tsx            # Início (gêneros, em alta, continue assistindo...)
 │   │   ├── mangas.tsx           # Mangás
 │   │   ├── favoritos.tsx        # Favoritos
 │   │   ├── minha-lista.tsx      # Lista por status
-│   │   └── historico.tsx        # Títulos vistos recentemente
-│   ├── mais.tsx                 # Menu aberto pela engrenagem
+│   │   ├── historico.tsx        # Títulos vistos recentemente
+│   │   └── mais.tsx             # Aba Perfil (cartão do usuário e menu)
 │   ├── notificacoes.tsx         # Novidades (episódios novos)
 │   ├── secao/[tipo].tsx         # Ver todos de uma seção do início
 │   ├── busca.tsx                # Busca + grade de categorias
@@ -204,7 +204,7 @@ src/
 │
 ├── components/                  # Componentes reutilizáveis
 │   ├── Avatar.tsx               # Foto de perfil com anel rosa
-│   ├── AppHeader.tsx            # Cabeçalho: logo, busca, novidades e menu
+│   ├── AppHeader.tsx            # Cabeçalho: logo, busca, novidades e configurações
 │   ├── GenreChips.tsx           # Barra de gêneros do início
 │   ├── SectionHeader.tsx        # Título de seção com selo e "Ver todos"
 │   ├── HeroCarousel.tsx         # Carrossel principal (arrasta, encaixa, autoplay)
@@ -246,7 +246,7 @@ src/
 ## Como o app funciona por dentro
 
 ### Navegação
-O **Expo Router** cria as rotas a partir dos arquivos em `src/app/`. A pasta `(tabs)` forma a barra inferior com 5 abas, e os demais arquivos são telas empilhadas por cima. Os arquivos `[id].tsx` e `[nome].tsx` recebem parâmetros lidos com `useLocalSearchParams`.
+O **Expo Router** cria as rotas a partir dos arquivos em `src/app/`. A pasta `(tabs)` forma a barra inferior com 6 abas, e os demais arquivos são telas empilhadas por cima. Os arquivos `[id].tsx` e `[nome].tsx` recebem parâmetros lidos com `useLocalSearchParams`.
 
 ### Consumo da API
 Todo o acesso à AniList passa por `src/services/anilist.ts`:
