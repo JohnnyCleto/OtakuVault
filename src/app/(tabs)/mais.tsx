@@ -3,6 +3,7 @@ import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from '
 import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Avatar from '../../components/Avatar';
+import Sakura from '../../components/Sakura';
 import { APP_VERSION } from '../../appInfo';
 import { useAuth } from '../../storage/auth';
 import { confirmar } from '../../utils/confirm';
@@ -57,12 +58,11 @@ export default function MaisScreen() {
     <ScrollView style={{ flex: 1, backgroundColor: colors.bg }} contentContainerStyle={styles.content}>
       <View style={styles.profile}>
         {PETALAS.map((p, i) => (
-          <Ionicons
+          <Sakura
             key={i}
-            name="flower"
             size={p.size}
-            color={colors.accent}
-            style={{ position: 'absolute', top: p.top, right: p.right, opacity: p.opacity }}
+            opacity={p.opacity}
+            style={{ position: 'absolute', top: p.top, right: p.right }}
           />
         ))}
 
@@ -116,7 +116,7 @@ export default function MaisScreen() {
 
       <View style={styles.footerLine}>
         <View style={styles.line} />
-        <Ionicons name="flower" size={18} color={colors.accent} />
+        <Sakura size={18} />
         <View style={styles.line} />
       </View>
       <Text style={styles.footer}>
