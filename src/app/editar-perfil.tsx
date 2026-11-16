@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
+import Avatar from '../components/Avatar';
 import { useAuth } from '../storage/auth';
 import { colors } from '../theme';
 
@@ -69,9 +70,10 @@ export default function EditarPerfilScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{(name.trim() || user.name).charAt(0).toUpperCase()}</Text>
-      </View>
+      <Pressable style={styles.avatarBox} onPress={() => router.push('/escolher-avatar')}>
+        <Avatar user={{ ...user, name: name.trim() || user.name }} size={96} />
+        <Text style={styles.change}>Trocar foto</Text>
+      </Pressable>
       <Text style={styles.muted}>{user.email}</Text>
 
       <Text style={styles.heading}>Dados do perfil</Text>
@@ -145,8 +147,8 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   center: { alignItems: 'center', justifyContent: 'center', padding: 24, gap: 10 },
   content: { padding: 20, gap: 10, paddingBottom: 40, alignItems: 'stretch' },
-  avatar: { width: 88, height: 88, borderRadius: 44, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', alignSelf: 'center' },
-  avatarText: { color: colors.bg, fontSize: 40, fontWeight: '800' },
+  avatarBox: { alignItems: 'center', alignSelf: 'center', gap: 8 },
+  change: { color: colors.accent, fontWeight: '700', fontSize: 14 },
   muted: { color: colors.textMuted, fontSize: 14, textAlign: 'center' },
   heading: { color: colors.text, fontSize: 20, fontWeight: '800', marginTop: 12 },
   label: { color: colors.textMuted, fontSize: 13, marginBottom: -4 },
