@@ -69,6 +69,7 @@ Projeto acadêmico da disciplina de aplicativos nativos.
   A tela **Minha lista** filtra por status, mostra a contagem de cada um e permite remover itens.
 
 ### Conta de usuário
+- **Tela de entrada**: ao abrir o app sem estar logado, a primeira tela é a de **login e cadastro**. Ela tem uma colagem com as capas dos animes em alta, as abas *Entrar* e *Criar conta*, campos com ícones, botão para mostrar a senha, confirmação de senha no cadastro e a opção **Continuar sem conta** (visitante). Depois de sair da conta, o app volta para essa tela.
 - **Cadastro e login** com validação de campos (e-mail válido, senha com no mínimo 6 caracteres, e-mail único).
 - **Sessão persistente**: o app lembra quem está logado ao ser reaberto.
 - **Foto de perfil**: escolha qualquer personagem de anime como avatar (galeria com os mais populares da AniList e busca por nome). Sem foto, aparece a inicial do nome.
@@ -117,7 +118,7 @@ O app tem **19 telas**: 6 abas e 13 telas de navegação.
 | 13 | Perfil | `perfil` | AsyncStorage |
 | 14 | Editar perfil | `editar-perfil` | AsyncStorage |
 | 15 | Configurações | `configuracoes` | AsyncStorage |
-| 16 | Login e cadastro | `login` | AsyncStorage |
+| 16 | Login e cadastro (tela inicial sem conta) | `login` | AniList + AsyncStorage |
 | 17 | Escolher foto de perfil | `escolher-avatar` | AniList + AsyncStorage |
 | 18 | Ajuda e suporte | `ajuda` | — |
 | 19 | Sobre | `sobre` | — |
@@ -205,7 +206,7 @@ src/
 │   ├── perfil.tsx               # Perfil do usuário
 │   ├── editar-perfil.tsx        # Edição de nome, bio e senha
 │   ├── configuracoes.tsx        # Configurações do app
-│   ├── login.tsx                # Login e cadastro
+│   ├── login.tsx                # Login e cadastro (primeira tela sem conta)
 │   ├── escolher-avatar.tsx      # Galeria de personagens para a foto de perfil
 │   ├── ajuda.tsx                # Perguntas frequentes
 │   └── sobre.tsx                # Sobre o app e versão
