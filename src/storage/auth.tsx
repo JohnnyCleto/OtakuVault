@@ -8,8 +8,10 @@ type StoredUser = {
   passwordHash: string;
   createdAt?: string;
   bio?: string;
+  avatar?: string;
 };
-export type User = { name: string; email: string; createdAt?: string; bio?: string };
+// avatar = URL da imagem de um personagem escolhido pelo usuário.
+export type User = { name: string; email: string; createdAt?: string; bio?: string; avatar?: string };
 
 type AuthValue = {
   user: User | null;
@@ -18,6 +20,7 @@ type AuthValue = {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (name: string, bio: string) => Promise<void>;
+  updateAvatar: (avatar: string | null) => Promise<void>;
   changePassword: (current: string, next: string) => Promise<void>;
   deleteAccount: () => Promise<void>;
 };
@@ -37,6 +40,7 @@ const publicUser = (u: StoredUser): User => ({
   email: u.email,
   createdAt: u.createdAt,
   bio: u.bio,
+  avatar: u.avatar,
 });
 
 function hashPassword(email: string, password: string) {
@@ -112,6 +116,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(publicUser(stored));
   }
 
+  async function updateAvatar(avatar: string | null) {
+    if (!user) throw new Error('Você precisa estar logado.');
+    const users = await readUsers();
+    const stored = users[user.email];
+    if (!stored) throw new Error('Conta não encontrada.');
+    if (avatar) stored.avatar = avatar;
+    else delete stored.avatar;
+    await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+    setUser(publicUser(stored));
+  }
+
   async function changePassword(current: string, next: string) {
     if (!user) throw new Error('Você precisa estar logado.');
     if (next.length < 6) throw new Error('A nova senha precisa ter pelo menos 6 caracteres.');
@@ -139,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, ready, register, login, logout, updateProfile, changePassword, deleteAccount }}
+      value={{ user, ready, register, login, logout, updateProfile, updateAvatar, changePassword, deleteAccount }}
     >
       {children}
     </AuthContext.Provider>
