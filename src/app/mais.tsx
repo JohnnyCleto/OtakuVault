@@ -12,7 +12,7 @@ export default function MaisScreen() {
 
   const items: { icon: IconName; title: string; sub: string; path: string }[] = [
     { icon: 'person-outline', title: 'Meu perfil', sub: 'Seus favoritos e dados da conta', path: user ? '/perfil' : '/login' },
-    { icon: 'list-outline', title: 'Minha lista', sub: 'Assistindo, completos, dropados...', path: user ? '/minha-lista' : '/login' },
+    { icon: 'notifications-outline', title: 'Novidades', sub: 'Episódios novos dos últimos dias', path: '/notificacoes' },
     { icon: 'create-outline', title: 'Editar perfil', sub: 'Deixe sua conta do seu jeito', path: '/editar-perfil' },
     { icon: 'settings-outline', title: 'Configurações', sub: 'Ajustes do aplicativo', path: '/configuracoes' },
   ];
