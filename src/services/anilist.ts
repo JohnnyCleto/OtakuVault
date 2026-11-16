@@ -406,6 +406,56 @@ export async function getPersonagens(id: number | string, perPage = 30): Promise
   );
 }
 
+export type PersonagemFoto = { id: number; name: string; image: string; anime: string | null };
+
+// Personagens para usar como foto de perfil: os mais favoritados da AniList
+// ou, se houver texto, os que batem com a busca.
+export async function getPersonagensFoto(
+  search = '',
+  page = 1
+): Promise<{ items: PersonagemFoto[]; hasNext: boolean }> {
+  const data = await gql<{
+    Page: {
+      pageInfo: { hasNextPage: boolean };
+      characters: {
+        id: number;
+        name: { full: string | null };
+        image: { large: string | null };
+        media: { nodes: { title: { romaji: string | null; english: string | null } }[] } | null;
+      }[];
+    };
+  }>(
+    `query ($page: Int, $search: String, $sort: [CharacterSort]) {
+       Page(page: $page, perPage: 30) {
+         pageInfo { hasNextPage }
+         characters(search: $search, sort: $sort) {
+           id
+           name { full }
+           image { large }
+           media(perPage: 1, sort: POPULARITY_DESC) { nodes { title { romaji english } } }
+         }
+       }
+     }`,
+    {
+      page,
+      search: search.trim() || undefined,
+      sort: search.trim() ? ['SEARCH_MATCH', 'FAVOURITES_DESC'] : ['FAVOURITES_DESC'],
+    }
+  );
+  const items = data.Page.characters
+    .filter((c) => c.image.large && !c.image.large.includes('/default.'))
+    .map((c) => {
+      const t = c.media?.nodes?.[0]?.title;
+      return {
+        id: c.id,
+        name: c.name.full ?? 'Sem nome',
+        image: c.image.large as string,
+        anime: t ? t.english || t.romaji : null,
+      };
+    });
+  return { items: uniqueById(items), hasNext: data.Page.pageInfo.hasNextPage };
+}
+
 export function clearCache() {
   cache.clear();
 }
