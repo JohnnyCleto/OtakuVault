@@ -148,6 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       SESSION_KEY,
       `favorites_v2:${user.email}`,
       `lista_v1:${user.email}`,
+      `historico_v1:${user.email}`,
     ]);
     setUser(null);
   }
