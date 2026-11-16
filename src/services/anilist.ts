@@ -67,6 +67,7 @@ const LIST_FIELDS = `
   seasonYear
   startDate { year }
   format status episodes chapters volumes
+  genres
   siteUrl
 `;
 
@@ -269,17 +270,18 @@ export async function searchMedia(
   };
 }
 
-export const getTrending = async (type: Kind, perPage = 12) =>
-  (await searchMedia({ type, sort: ['TRENDING_DESC'], perPage })).items;
+// O parâmetro genre é opcional: sem ele, a lista inclui todos os gêneros.
+export const getTrending = async (type: Kind, perPage = 12, genre?: string) =>
+  (await searchMedia({ type, genre, sort: ['TRENDING_DESC'], perPage })).items;
 
-export const getTopRated = async (type: Kind, perPage = 12) =>
-  (await searchMedia({ type, sort: ['SCORE_DESC'], popularityGreater: 10000, perPage })).items;
+export const getTopRated = async (type: Kind, perPage = 12, genre?: string) =>
+  (await searchMedia({ type, genre, sort: ['SCORE_DESC'], popularityGreater: 10000, perPage })).items;
 
 export const getPopular = async (type: Kind, perPage = 12) =>
   (await searchMedia({ type, sort: ['POPULARITY_DESC'], perPage })).items;
 
-export const getRecentlyAdded = async (type: Kind, perPage = 12) =>
-  (await searchMedia({ type, sort: ['ID_DESC'], popularityGreater: 500, perPage })).items;
+export const getRecentlyAdded = async (type: Kind, perPage = 12, genre?: string) =>
+  (await searchMedia({ type, genre, sort: ['ID_DESC'], popularityGreater: 500, perPage })).items;
 
 export const getRecentlyUpdated = async (type: Kind, perPage = 12) =>
   (
