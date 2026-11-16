@@ -49,7 +49,7 @@ export default function InicioScreen() {
     <ScrollView style={{ flex: 1, backgroundColor: colors.bg }} contentContainerStyle={{ paddingBottom: 24 }}>
       <GenreChips value={genre} onChange={setGenre} />
 
-      <HeroCarousel key={genre ?? "todos"} title="Em alta" state={trending} />
+      <HeroCarousel key={genre ?? 'todos'} title="Em alta" state={trending} />
 
       {continuar.length > 0 && (
         <View style={{ marginBottom: 24 }}>
