@@ -20,9 +20,12 @@ export default function RootLayout() {
                   headerStyle: { backgroundColor: colors.bg },
                   headerTintColor: colors.text,
                   contentStyle: { backgroundColor: colors.bg },
+                  // Mostra só a seta de voltar, sem o nome da tela anterior
+                  // (antes aparecia "(tabs)", o nome interno do grupo de abas).
+                  headerBackButtonDisplayMode: 'minimal',
                 }}
               >
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Início' }} />
                 <Stack.Screen name="busca" options={{ headerShown: false }} />
                 <Stack.Screen name="titulo/[id]" options={{ title: 'Detalhes' }} />
                 <Stack.Screen name="categoria/[nome]" options={{ title: 'Categoria' }} />
