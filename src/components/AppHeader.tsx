@@ -3,12 +3,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useNovidades } from '../hooks/useNovidades';
+import { useSettings } from '../storage/settings';
 import { APP_NAME_PARTS, colors } from '../theme';
 
 export default function AppHeader() {
   const insets = useSafeAreaInsets();
   const { meus } = useNovidades();
-  const temNovidade = meus.length > 0;
+  const { novidadesDot } = useSettings();
+  const temNovidade = novidadesDot && meus.length > 0;
 
   return (
     <View style={[styles.bar, { paddingTop: insets.top + 8 }]}>
