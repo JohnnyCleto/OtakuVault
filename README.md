@@ -174,6 +174,7 @@ Depois, abra o **Expo Go** no celular e leia o QR code que aparece no terminal.
 | Tela de carregamento que não termina | Teste `https://graphql.anilist.co` no navegador do celular. Se não abrir, é problema de rede |
 | Celular não conecta ao projeto | Confirme a mesma rede Wi-Fi, ou rode `npx expo start --tunnel` |
 | Telas ou abas que não deveriam existir | Sobrou arquivo antigo na pasta `src`: apague a pasta inteira e copie de novo |
+| Abre um painel meio transparente com "Reload", "Go home" e "Tools" | É o menu de desenvolvedor do **Expo Go**, não faz parte do app. Ele abre ao chacoalhar o celular ou pelo botão flutuante do Expo. Para não confundir com a engrenagem do app, desligue o "Tools button" nesse painel |
 | Erros que só aparecem no navegador (tecla `w`) | Teste no Expo Go: o navegador impõe restrições de rede que o app nativo não tem |
 
 ---
