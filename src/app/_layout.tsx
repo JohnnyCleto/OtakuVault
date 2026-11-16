@@ -34,6 +34,7 @@ export default function RootLayout() {
                 <Stack.Screen name="mais" options={{ title: 'Menu' }} />
                 <Stack.Screen name="notificacoes" options={{ title: 'Novidades' }} />
                 <Stack.Screen name="secao/[tipo]" options={{ title: 'Ver todos' }} />
+                <Stack.Screen name="escolher-avatar" options={{ title: 'Foto de perfil' }} />
               </Stack>
             </HistoricoProvider>
           </ListaProvider>
