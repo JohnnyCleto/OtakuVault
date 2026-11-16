@@ -10,6 +10,7 @@ import { openCategoria } from '../../navigation';
 import { getTitulo, nomeExibicao } from '../../services/anilist';
 import { useFavorites } from '../../storage/favorites';
 import { useHistorico } from '../../storage/historico';
+import { useSettings } from '../../storage/settings';
 import { STATUS_COLOR, statusLabel, useLista } from '../../storage/lista';
 import { colors } from '../../theme';
 
@@ -20,10 +21,11 @@ export default function TituloDetalheScreen() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const state = useAsync(() => getTitulo(id), [id]);
   const { registrar } = useHistorico();
+  const { salvarHistorico } = useSettings();
 
   // Registra a visita no histórico assim que os dados chegam.
   useEffect(() => {
-    if (state.data) registrar(state.data);
+    if (state.data && salvarHistorico) registrar(state.data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.data?.id]);
 
