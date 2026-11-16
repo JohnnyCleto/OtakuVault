@@ -68,7 +68,9 @@ Projeto acadêmico da disciplina de aplicativos nativos.
 ### Conta de usuário
 - **Cadastro e login** com validação de campos (e-mail válido, senha com no mínimo 6 caracteres, e-mail único).
 - **Sessão persistente**: o app lembra quem está logado ao ser reaberto.
-- **Perfil**: avatar com inicial, "sobre mim", contagem de favoritos, contadores da lista por status e data de cadastro ("Membro desde").
+- **Foto de perfil**: escolha qualquer personagem de anime como avatar (galeria com os mais populares da AniList e busca por nome). Sem foto, aparece a inicial do nome.
+- **Menu** (engrenagem): cartão com a foto, o nome e o e-mail de quem está logado, atalhos para perfil, lista, configurações, ajuda e sobre.
+- **Perfil**: avatar, contagem de favoritos, contadores da lista por status e data de cadastro ("Membro desde").
 - **Editar perfil**: altera nome e "sobre mim" (até 160 caracteres) e a senha.
 - Favoritos e lista são **separados por usuário**. Sem login, valem para o "visitante".
 
@@ -89,7 +91,7 @@ Projeto acadêmico da disciplina de aplicativos nativos.
 
 ## Telas do aplicativo
 
-O app tem **16 telas**: 5 abas e 11 telas de navegação.
+O app tem **19 telas**: 5 abas e 14 telas de navegação.
 
 | # | Tela | Rota | Origem dos dados |
 |---|------|------|------------------|
@@ -109,6 +111,9 @@ O app tem **16 telas**: 5 abas e 11 telas de navegação.
 | 14 | Editar perfil | `editar-perfil` | AsyncStorage |
 | 15 | Configurações | `configuracoes` | AsyncStorage |
 | 16 | Login e cadastro | `login` | AsyncStorage |
+| 17 | Escolher foto de perfil | `escolher-avatar` | AniList + AsyncStorage |
+| 18 | Ajuda e suporte | `ajuda` | — |
+| 19 | Sobre | `sobre` | — |
 
 As rotas com colchetes (`[id]`, `[nome]`) são **rotas dinâmicas**: recebem um parâmetro pela navegação.
 
@@ -192,9 +197,13 @@ src/
 │   ├── perfil.tsx               # Perfil do usuário
 │   ├── editar-perfil.tsx        # Edição de nome, bio e senha
 │   ├── configuracoes.tsx        # Configurações do app
-│   └── login.tsx                # Login e cadastro
+│   ├── login.tsx                # Login e cadastro
+│   ├── escolher-avatar.tsx      # Galeria de personagens para a foto de perfil
+│   ├── ajuda.tsx                # Perguntas frequentes
+│   └── sobre.tsx                # Sobre o app e versão
 │
 ├── components/                  # Componentes reutilizáveis
+│   ├── Avatar.tsx               # Foto de perfil com anel rosa
 │   ├── AppHeader.tsx            # Cabeçalho: logo, busca, novidades e menu
 │   ├── GenreChips.tsx           # Barra de gêneros do início
 │   ├── SectionHeader.tsx        # Título de seção com selo e "Ver todos"
