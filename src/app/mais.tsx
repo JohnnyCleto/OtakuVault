@@ -2,8 +2,8 @@ import type { ComponentProps } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../storage/auth';
-import { colors } from '../../theme';
+import { useAuth } from '../storage/auth';
+import { colors } from '../theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 

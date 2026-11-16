@@ -31,6 +31,7 @@ export default function RootLayout() {
                 <Stack.Screen name="editar-perfil" options={{ title: 'Editar perfil' }} />
                 <Stack.Screen name="configuracoes" options={{ title: 'Configurações' }} />
                 <Stack.Screen name="login" options={{ title: 'Entrar' }} />
+                <Stack.Screen name="mais" options={{ title: 'Menu' }} />
               </Stack>
             </HistoricoProvider>
           </ListaProvider>
